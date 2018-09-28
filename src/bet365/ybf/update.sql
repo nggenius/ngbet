@@ -1,1 +1,0 @@
-select a.id, a.rule, a.league_name, a.ho_team_name, a.gu_team_name, a.ho_score, a.gu_score, b.ho_half_score, b.gu_half_score, b.ho_score, b.gu_score, ((b.ho_half_score + b.gu_half_score) > (a.ho_score+a.gu_score)) as halfwin , ((b.ho_score+b.gu_score)>(a.ho_score+a.gu_score)) as win   from filter as a, snap_shoot as b where a.match_id=b.match_id and b.status=-1 order by a.id
