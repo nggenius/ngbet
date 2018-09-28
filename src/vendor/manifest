@@ -1,0 +1,214 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/PuerkitoBio/goquery",
+			"repository": "https://github.com/PuerkitoBio/goquery",
+			"vcs": "git",
+			"revision": "dc2ec5c7ca4d9aae063b79b9f581dd3ea6afd2b2",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/astaxie/beego/logs",
+			"repository": "https://github.com/astaxie/beego",
+			"vcs": "git",
+			"revision": "053a075344c118a5cc41981b29ef612bb53d20ca",
+			"branch": "master",
+			"path": "/logs",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/belogik/goes",
+			"repository": "https://github.com/belogik/goes",
+			"vcs": "git",
+			"revision": "e54d722c3aff588e4c737fe11c07359019240824",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/cheggaaa/pb",
+			"repository": "https://github.com/cheggaaa/pb",
+			"vcs": "git",
+			"revision": "2af8bbdea9e99e83b3ac400d8f6b6d1b8cbbf338",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/cloudflare/golz4",
+			"repository": "https://github.com/cloudflare/golz4",
+			"vcs": "git",
+			"revision": "ef862a3cdc58a6f1fee4e3af3d44fbe279194cde",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-sql-driver/mysql",
+			"repository": "https://github.com/go-sql-driver/mysql",
+			"vcs": "git",
+			"revision": "99ff426eb706cffe92ff3d058e168b278cabf7c7",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-xorm/builder",
+			"repository": "https://github.com/go-xorm/builder",
+			"vcs": "git",
+			"revision": "377feedb49e3aab9537dcb7e428b74f06635fb54",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-xorm/core",
+			"repository": "https://github.com/go-xorm/core",
+			"vcs": "git",
+			"revision": "b8d39bd0ff10e7262fa46dbc18c784308bd47e14",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-xorm/xorm",
+			"repository": "https://github.com/go-xorm/xorm",
+			"vcs": "git",
+			"revision": "68af41e76442c671d1931b6d0ca00694925b7de7",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/proto",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "e14cafb6a2c249986e51c4b65c3206bf18578715",
+			"branch": "master",
+			"path": "/proto",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/sortkeys",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "e14cafb6a2c249986e51c4b65c3206bf18578715",
+			"branch": "master",
+			"path": "sortkeys",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/types",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "e14cafb6a2c249986e51c4b65c3206bf18578715",
+			"branch": "master",
+			"path": "types",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/google/go-querystring/query",
+			"repository": "https://github.com/google/go-querystring",
+			"vcs": "git",
+			"revision": "44c6ddd0a2342c386950e880b658017258da92fc",
+			"branch": "master",
+			"path": "/query",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/websocket",
+			"repository": "https://github.com/gorilla/websocket",
+			"vcs": "git",
+			"revision": "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/levigross/grequests",
+			"repository": "https://github.com/levigross/grequests",
+			"vcs": "git",
+			"revision": "3f841d606c5aba51bee0b5bcdc6b293905836d77",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-runewidth",
+			"repository": "https://github.com/mattn/go-runewidth",
+			"vcs": "git",
+			"revision": "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-sqlite3",
+			"repository": "https://github.com/mattn/go-sqlite3",
+			"vcs": "git",
+			"revision": "593fde6929df5acf164ede346d6b0a98597ed9d2",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mdp/qrterminal",
+			"repository": "https://github.com/mdp/qrterminal",
+			"vcs": "git",
+			"revision": "ba5dc6cf021fd0a9d785890d66e5fc0e3104cfae",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mysll/toolkit",
+			"repository": "https://github.com/mysll/toolkit",
+			"vcs": "git",
+			"revision": "10b5d1a1d3b0f0f5e6a6fd8d9938607e75f107c1",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/songtianyi/laosj/spider",
+			"repository": "https://github.com/songtianyi/laosj",
+			"vcs": "git",
+			"revision": "760f7844583a7499944a9b8b3de73d5c48a15814",
+			"branch": "master",
+			"path": "/spider",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/songtianyi/rrframework/config",
+			"repository": "https://github.com/songtianyi/rrframework",
+			"vcs": "git",
+			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
+			"branch": "master",
+			"path": "/config",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/songtianyi/rrframework/logs",
+			"repository": "https://github.com/songtianyi/rrframework",
+			"vcs": "git",
+			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
+			"branch": "master",
+			"path": "/logs",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/songtianyi/rrframework/storage",
+			"repository": "https://github.com/songtianyi/rrframework",
+			"vcs": "git",
+			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
+			"branch": "master",
+			"path": "/storage",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/songtianyi/wechat-go",
+			"repository": "https://github.com/songtianyi/wechat-go",
+			"vcs": "git",
+			"revision": "6714afaad18974e59becec1c0253f1989000568a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "rsc.io/qr",
+			"repository": "https://github.com/rsc/qr",
+			"vcs": "git",
+			"revision": "ca9a01fc2f9505024045632c50e5e8cd6142fafe",
+			"branch": "master",
+			"notests": true
+		}
+	]
+}
