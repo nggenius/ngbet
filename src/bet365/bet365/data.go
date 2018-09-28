@@ -273,6 +273,8 @@ func (d *Bet365Data) parseTime(data []byte) {
 }
 
 func (d *Bet365Data) FindNode(it string) *Node {
+	d.Lock()
+	defer d.Unlock()
 	if n, ok := d.ItHash[it]; ok {
 		return n
 	}
@@ -298,6 +300,8 @@ func (d *Bet365Data) ChildByType(node *Node, t string) []*Node {
 }
 
 func (d *Bet365Data) AddNode(parent *Node, node *Node) *Node {
+	d.Lock()
+	defer d.Unlock()
 	node.parent = parent
 	it := node.It()
 	if it == "" {
@@ -332,7 +336,9 @@ func (d *Bet365Data) Remove(it string) {
 	}
 
 	node.parent = nil
+	d.Lock()
 	delete(d.ItHash, it)
+	d.Unlock()
 	d.Lock()
 	d.del = append(d.del, it)
 	d.Unlock()
