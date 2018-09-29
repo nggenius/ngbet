@@ -237,6 +237,28 @@ func (b *Bet365) process() {
 			}
 		}
 	}
+
+	b.CheckOdd()
+}
+
+func (b *Bet365) CheckOdd() {
+	for it, fs := range b.filter {
+		match := b.matchs[it]
+		if match == nil {
+			continue
+		}
+		for _, f := range fs {
+			if f.HalfState == STATUS_SECONDHALF && f.WaitOdd && f.FilterState == FILTER_STATE_NONE { // 只判断下半场
+				if match.Size-f.AboveSize() > 0.1 {
+					continue
+				}
+				f.WaitOdd = false
+				f.Update("wait_odd")
+				msg := f.MakeNoticeOdd()
+				chat.SendQQMessage(msg)
+			}
+		}
+	}
 }
 
 func (b *Bet365) Snapshoot(e int, m *Match) {
@@ -274,7 +296,7 @@ func (b *Bet365) CheckRed(m *Match) {
 			if v.HalfState == m.State && v.FilterState == FILTER_STATE_NONE {
 				if m.Score() > v.Score() {
 					v.FilterState = FILTER_STATE_RED
-					v.Update()
+					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
 					chat.SendQQMessage(msg)
@@ -290,7 +312,7 @@ func (b *Bet365) ResetRed(m *Match) {
 			if v.HalfState == m.State && v.FilterState != FILTER_STATE_NONE {
 				if m.Score() == v.Score() {
 					v.FilterState = FILTER_STATE_NONE
-					v.Update()
+					v.Update("filter_state")
 					msg := v.MakeResultMessage(true, m)
 					log.Println(msg)
 					chat.SendQQMessage(msg)
@@ -310,7 +332,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					} else {
 						v.FilterState = FILTER_STATE_BLACK
 					}
-					v.Update()
+					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
 					chat.SendQQMessage(msg)
@@ -324,7 +346,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					} else {
 						v.FilterState = FILTER_STATE_BLACK
 					}
-					v.Update()
+					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
 					chat.SendQQMessage(msg)
@@ -421,13 +443,13 @@ func Run(addr string, origin string, getcookieurl string) {
 			continue
 		}
 
-		chat.SendQQMessage("连接成功")
+		//chat.SendQQMessage("连接成功")
 		log.Println("connected")
 		err = bet.work()
 		if err != nil {
 			bet.conn.close()
 			log.Printf("catch err: %s, waiting 3 seconds to reconnect", err)
-			chat.SendQQMessage("系统异常，3秒后重新连接")
+			//chat.SendQQMessage("系统异常，3秒后重新连接")
 			time.Sleep(time.Second * 3)
 			continue
 		}

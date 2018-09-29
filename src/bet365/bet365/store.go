@@ -136,6 +136,7 @@ type Filter struct {
 	FirstSizeSma float64
 	FilterState  int
 	HalfState    int
+	WaitOdd      bool
 }
 
 func (f *Filter) MakeResultMessage(reset bool, m *Match) string {
@@ -170,8 +171,12 @@ func (f *Filter) Dogfall() int {
 	return int(ratio)
 }
 
+func (f *Filter) AboveSize() float64 {
+	return float64(f.HoScore+f.GuScore) + 0.5
+}
+
 func (f *Filter) MakeRuleMessage() string {
-	rescore := float64(f.HoScore+f.GuScore) + 0.5
+	rescore := f.AboveSize()
 	var half string
 	if f.HalfState == STATUS_FIRSTHALF {
 		half = "半场"
@@ -180,9 +185,14 @@ func (f *Filter) MakeRuleMessage() string {
 	}
 	s := fmt.Sprintf("/足球[%s] \n%s \n%s \n当前比分:%d-%d\n平局概率:%d%%\n推荐:%s大%.1f", f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore)
 	if f.HalfState == STATUS_SECONDHALF && f.Size-rescore > 0.1 { // 当前盘比目标盘大
+		f.WaitOdd = true
 		s += fmt.Sprintf("\n/闪电注意：当前盘口(%.2f)高于推荐盘口,可等水", f.Size)
 	}
 	return s
+}
+
+func (f *Filter) MakeNoticeOdd() string {
+	return fmt.Sprintf("/高铁左车头[%s]\n%s\n%s\n降盘啦，快上车", f.Rule, f.LeagueName, f.TeamName)
 }
 
 func (f *Filter) Insert() {
@@ -192,8 +202,8 @@ func (f *Filter) Insert() {
 	}
 }
 
-func (f *Filter) Update() {
-	engine.Id(f.Id).Cols("filter_state").Update(f)
+func (f *Filter) Update(col string) {
+	engine.Id(f.Id).Cols(col).Update(f)
 }
 
 func (f *Filter) Score() int {
