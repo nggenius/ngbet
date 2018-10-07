@@ -50,6 +50,7 @@ func split(data []byte) map[string]string {
 }
 
 type Node struct {
+	sync.Mutex
 	tag    string
 	child  map[string]*Node
 	attrs  map[string]string
@@ -57,12 +58,16 @@ type Node struct {
 }
 
 func (n *Node) Update(kv map[string]string) {
+	n.Lock()
+	defer n.Unlock()
 	for k, v := range kv {
 		n.attrs[k] = v
 	}
 }
 
 func (n *Node) It() string {
+	n.Lock()
+	defer n.Unlock()
 	if it, ok := n.attrs["IT"]; ok {
 		return it
 	}
@@ -99,6 +104,8 @@ func (n *Node) State() int {
 }
 
 func (n *Node) Attr(key string) string {
+	n.Lock()
+	defer n.Unlock()
 	if v, ok := n.attrs[key]; ok {
 		return v
 	}
@@ -338,8 +345,6 @@ func (d *Bet365Data) Remove(it string) {
 	node.parent = nil
 	d.Lock()
 	delete(d.ItHash, it)
-	d.Unlock()
-	d.Lock()
 	d.del = append(d.del, it)
 	d.Unlock()
 }

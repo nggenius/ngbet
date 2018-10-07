@@ -192,7 +192,7 @@ func (f *Filter) MakeRuleMessage() string {
 }
 
 func (f *Filter) MakeNoticeOdd() string {
-	return fmt.Sprintf("/高铁左车头[%s]\n%s\n%s\n降盘啦，快上车", f.Rule, f.LeagueName, f.TeamName)
+	return fmt.Sprintf("/开车[%s]\n%s\n%s\n降盘啦，快上车", f.Rule, f.LeagueName, f.TeamName)
 }
 
 func (f *Filter) Insert() {
