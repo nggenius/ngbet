@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/levigross/grequests"
@@ -107,6 +108,7 @@ func (b *bet365conn) subscibe(topic string) error {
 }
 
 func (b *bet365conn) ReadMessage() (messageType int, p []byte, err error) {
+	b.c.SetReadDeadline(time.Now().Add(time.Minute))
 	return b.c.ReadMessage()
 }
 

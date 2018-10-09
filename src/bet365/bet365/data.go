@@ -50,24 +50,30 @@ func split(data []byte) map[string]string {
 }
 
 type Node struct {
-	sync.Mutex
 	tag    string
 	child  map[string]*Node
 	attrs  map[string]string
 	parent *Node
 }
 
+func (n *Node) Root() *Node {
+	var p, it *Node
+	for p = n.parent; p != nil; p = p.parent {
+		if p.tag != "" {
+			it = p
+		}
+	}
+
+	return it
+}
+
 func (n *Node) Update(kv map[string]string) {
-	n.Lock()
-	defer n.Unlock()
 	for k, v := range kv {
 		n.attrs[k] = v
 	}
 }
 
 func (n *Node) It() string {
-	n.Lock()
-	defer n.Unlock()
 	if it, ok := n.attrs["IT"]; ok {
 		return it
 	}
@@ -104,8 +110,6 @@ func (n *Node) State() int {
 }
 
 func (n *Node) Attr(key string) string {
-	n.Lock()
-	defer n.Unlock()
 	if v, ok := n.attrs[key]; ok {
 		return v
 	}
@@ -198,7 +202,7 @@ func NewSimpleNode(t string) *Node {
 }
 
 type Bet365Data struct {
-	sync.Mutex
+	sync.RWMutex
 	RootName  string
 	Root      *Node
 	ItHash    map[string]*Node
@@ -280,8 +284,6 @@ func (d *Bet365Data) parseTime(data []byte) {
 }
 
 func (d *Bet365Data) FindNode(it string) *Node {
-	d.Lock()
-	defer d.Unlock()
 	if n, ok := d.ItHash[it]; ok {
 		return n
 	}
@@ -307,14 +309,11 @@ func (d *Bet365Data) ChildByType(node *Node, t string) []*Node {
 }
 
 func (d *Bet365Data) AddNode(parent *Node, node *Node) *Node {
-	d.Lock()
-	defer d.Unlock()
 	node.parent = parent
 	it := node.It()
 	if it == "" {
 		panic("IT is empty")
 	}
-
 	d.ItHash[it] = node
 
 	parent.AddChild(node)
@@ -343,22 +342,18 @@ func (d *Bet365Data) Remove(it string) {
 	}
 
 	node.parent = nil
-	d.Lock()
 	delete(d.ItHash, it)
 	d.del = append(d.del, it)
-	d.Unlock()
 }
 
 func (d *Bet365Data) GetDel() []string {
 	var ds []string
-	d.Lock()
 	if len(d.del) > 0 {
 		for _, v := range d.del {
 			ds = append(ds, v)
 		}
 		d.del = d.del[:0]
 	}
-	d.Unlock()
 	return ds
 }
 
@@ -575,7 +570,8 @@ func ParseData(d *Bet365Data, path []byte, data []byte) error {
 	}
 
 	it := string(p[0])
-
+	d.Lock()
+	defer d.Unlock()
 	switch it {
 	case "OVInPlay_10_0":
 		ParseInPlay(d, p, data)

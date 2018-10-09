@@ -28,13 +28,26 @@ const (
 	STATUS_COMPLETE   = 4 // 完赛
 )
 
+const (
+	RULE_334     = "334"
+	RULE_7091    = "7091"
+	RULE_757     = "757"
+	RULE_HALF_05 = "half0.5"
+)
+
 var (
 	FT_RESULT   = 1777  // 全场胜平负
 	FT_HANDICAP = 10147 // 全场亚洲让分盘
 	FT_GOALS    = 10148 // 全场大小球
 	FT_ODDS     = []int{FT_RESULT, FT_HANDICAP, FT_GOALS}
-	RULES       = []string{"334", "7091", "757"}
-	engine      *xorm.Engine
+
+	HT_RESULT   = 10161 // 半场胜平负
+	HT_HANDICAP = 10170 // 半场亚洲让分盘
+	HT_GOALS    = 10171 // 半场大小球
+	HT_ODDS     = []int{HT_RESULT, HT_HANDICAP, HT_GOALS}
+
+	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05}
+	engine *xorm.Engine
 )
 
 const (
@@ -87,7 +100,6 @@ func (b *Bet365) onMessage(data []byte) error {
 	xx := bytes.Split(data, []byte(_DELIMITERS_MESSAGE))
 	if xx[0][0] == '1' {
 		err := b.conn.subscibe("CONFIG_10_0,OVInPlay_10_0")
-		//b.conn.c.SetReadDeadline(time.Now().Add(time.Minute))
 		if err != nil {
 			return err
 		}
@@ -101,10 +113,12 @@ func (b *Bet365) onMessage(data []byte) error {
 		switch string(path) {
 		case "OVInPlay_10_0":
 			if !b.sendovm {
-				err := b.conn.subscibe("OVM3") // 亚洲让分盘
-				//b.conn.c.SetReadDeadline(time.Now().Add(time.Minute))
-				if err != nil {
-					return err
+				for _, s := range []string{"OVM2", "OVM3"} {
+					err := b.conn.subscibe(s) // 亚洲让分盘
+					if err != nil {
+						return err
+					}
+					time.Sleep(time.Second)
 				}
 				b.sendovm = true
 			}
@@ -181,6 +195,8 @@ func (b *Bet365) addMatch(m *Match) {
 }
 
 func (b *Bet365) process() {
+	b.data.RLock()
+	defer b.data.RUnlock()
 	node := b.data.FindNode("OV_1_10_0")
 	if node == nil {
 		return
@@ -221,10 +237,12 @@ func (b *Bet365) process() {
 			switch e {
 			case EVENT_UPDATE_TIME:
 				b.Filter(match)
+				b.CheckActive(match)
 			default:
 				b.CheckFilter(e, match)
 			}
 		}
+
 	}
 
 	dels := b.data.GetDel()
@@ -293,7 +311,7 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 func (b *Bet365) CheckRed(m *Match) {
 	if fs, ok := b.filter[m.It]; ok {
 		for _, v := range fs {
-			if v.HalfState == m.State && v.FilterState == FILTER_STATE_NONE {
+			if v.HalfState == m.State && v.FilterState == FILTER_STATE_NONE && !v.Inactive {
 				if m.Score() > v.Score() {
 					v.FilterState = FILTER_STATE_RED
 					v.Update("filter_state")
@@ -326,7 +344,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 	if fs, ok := b.filter[m.It]; ok {
 		for _, v := range fs {
 			if m.State == STATUS_MIDDLE && v.HalfState == STATUS_FIRSTHALF { // 中场
-				if v.FilterState == FILTER_STATE_NONE {
+				if v.FilterState == FILTER_STATE_NONE && !v.Inactive {
 					if m.Score() > v.Score() {
 						v.FilterState = FILTER_STATE_RED
 					} else {
@@ -340,7 +358,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 			}
 
 			if m.State == STATUS_COMPLETE && v.HalfState == STATUS_SECONDHALF { // 完赛
-				if v.FilterState == FILTER_STATE_NONE {
+				if v.FilterState == FILTER_STATE_NONE && !v.Inactive {
 					if m.Score() > v.Score() {
 						v.FilterState = FILTER_STATE_RED
 					} else {
@@ -357,9 +375,51 @@ func (b *Bet365) CheckBlack(m *Match) {
 }
 
 func (b *Bet365) Filter(m *Match) {
+	b.rulehalf05(m)
 	b.rule334(m)
 	b.rule7091(m)
 	b.rule757(m)
+}
+
+func (b *Bet365) CheckActive(m *Match) {
+	if fs, ok := b.filter[m.It]; ok {
+		for _, v := range fs {
+			if !v.Inactive {
+				continue
+			}
+			v.CheckActive(m)
+		}
+	}
+}
+
+func (b *Bet365) rulehalf05(m *Match) {
+	if m.Min != 20 || m.Score() != 0 {
+		return
+	}
+
+	f := new(Filter)
+	f.Rule = RULE_HALF_05
+	if f.LoadFromDB(m.It, f.Rule) {
+		return
+	}
+
+	f.Inactive = true
+	// 大小盘中水以上，大小盘2球以上， 降一个盘以内， 初盘大小球2.25-3.0之间,
+	// 初盘让0.5以上
+	if m.SizeBig > 1.85 &&
+		m.Size > 2.0 &&
+		m.FirstSize-m.Size < 0.251 &&
+		m.FirstSize > 2.249 &&
+		m.FirstSize < 3.01 &&
+		math.Abs(m.FirstLet) > 0.49 {
+		f.HalfState = STATUS_FIRSTHALF
+		f.FilterState = FILTER_STATE_NONE
+		f.CopyFromMatch(m)
+		f.Insert()
+		b.filter[m.It][f.Rule] = f
+		log.Println("[half0.5]", m.String())
+	}
+
 }
 
 func (b *Bet365) rule334(m *Match) {
@@ -367,10 +427,11 @@ func (b *Bet365) rule334(m *Match) {
 		return
 	}
 	f := new(Filter)
-	if f.LoadFromDB(m.It, "334") {
+	f.Rule = RULE_334
+	if f.LoadFromDB(m.It, f.Rule) {
 		return
 	}
-	f.Rule = "334"
+
 	f.HalfState = STATUS_FIRSTHALF
 	f.FilterState = FILTER_STATE_NONE
 	f.CopyFromMatch(m)
@@ -386,12 +447,17 @@ func (b *Bet365) rule7091(m *Match) {
 		return
 	}
 
-	if math.Abs(m.Let) > 0.249 && math.Abs(float64(m.HoScore-m.GuScore)) < 1.01 && m.SizeBig > 1.85 && m.SizeBig < 2.0 {
+	if math.Abs(m.Let) > 0.249 &&
+		math.Abs(float64(m.HoScore-m.GuScore)) < 1.01 &&
+		m.SizeBig > 1.85 &&
+		m.SizeBig < 2.0 {
+
 		f := new(Filter)
-		if f.LoadFromDB(m.It, "7091") {
+		f.Rule = RULE_7091
+		if f.LoadFromDB(m.It, f.Rule) {
 			return
 		}
-		f.Rule = "7091"
+
 		f.HalfState = STATUS_SECONDHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
@@ -409,10 +475,11 @@ func (b *Bet365) rule757(m *Match) {
 	}
 	if m.HoScore+m.GuScore == 6 {
 		f := new(Filter)
-		if f.LoadFromDB(m.It, "757") {
+		f.Rule = RULE_757
+		if f.LoadFromDB(m.It, f.Rule) {
 			return
 		}
-		f.Rule = "757"
+
 		f.HalfState = STATUS_SECONDHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
@@ -433,7 +500,7 @@ func Run(addr string, origin string, getcookieurl string) {
 
 	engine.Sync2(new(Match), new(Filter), new(SnapShot))
 
-	chat.SendQQMessage("初始化，数据源:365, 规则:334, 7091, 757, 测试模式")
+	chat.SendQQMessage("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式")
 	bet := NewBet365()
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)
