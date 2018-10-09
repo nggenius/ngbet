@@ -3,6 +3,7 @@ package bet365
 import (
 	"bytes"
 	"chat"
+	"fmt"
 	"log"
 	"math"
 	"strconv"
@@ -33,6 +34,7 @@ const (
 	RULE_7091    = "7091"
 	RULE_757     = "757"
 	RULE_HALF_05 = "half0.5"
+	RULE_HALF_EQ = "halfeq"
 )
 
 var (
@@ -46,7 +48,7 @@ var (
 	HT_GOALS    = 10171 // 半场大小球
 	HT_ODDS     = []int{HT_RESULT, HT_HANDICAP, HT_GOALS}
 
-	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05}
+	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05, RULE_HALF_EQ}
 	engine *xorm.Engine
 )
 
@@ -300,6 +302,9 @@ func (b *Bet365) Snapshoot(e int, m *Match) {
 func (b *Bet365) CheckFilter(e int, m *Match) {
 	switch e {
 	case EVENT_CHANGE_STATE:
+		if m.State == STATUS_FIRSTHALF {
+			b.rulehalfeq(m)
+		}
 		b.CheckBlack(m)
 	case EVENT_GOAL:
 		b.CheckRed(m)
@@ -392,6 +397,35 @@ func (b *Bet365) CheckActive(m *Match) {
 	}
 }
 
+func (b *Bet365) rulehalfeq(m *Match) {
+	if m.Min != 0 {
+		return
+	}
+
+	f := new(Filter)
+	f.Rule = RULE_HALF_EQ
+	if f.LoadFromDB(m.It, f.Rule) {
+		return
+	}
+
+	f.Inactive = true
+
+	if m.AvgEq > 3.0 && m.AvgEq < 3.7 {
+		avgeq := m.AvgEq * 0.618
+		if m.HalfAvgEq > 2.05 && m.HalfAvgEq-avgeq > 0.15 {
+			f.HalfState = STATUS_FIRSTHALF
+			f.FilterState = FILTER_STATE_NONE
+			f.CopyFromMatch(m)
+			f.Insert()
+			b.filter[m.It][f.Rule] = f
+			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。", m.LeagueName, m.TeamName)
+			log.Println(msg)
+			chat.SendQQMessage(msg)
+		}
+	}
+
+}
+
 func (b *Bet365) rulehalf05(m *Match) {
 	if m.Min != 20 || m.Score() != 0 {
 		return
@@ -403,7 +437,7 @@ func (b *Bet365) rulehalf05(m *Match) {
 		return
 	}
 
-	f.Inactive = true
+	//f.Inactive = true
 	// 大小盘中水以上，大小盘2球以上， 降一个盘以内， 初盘大小球2.25-3.0之间,
 	// 初盘让0.5以上
 	if m.SizeBig > 1.85 &&
@@ -417,7 +451,9 @@ func (b *Bet365) rulehalf05(m *Match) {
 		f.CopyFromMatch(m)
 		f.Insert()
 		b.filter[m.It][f.Rule] = f
-		log.Println("[half0.5]", m.String())
+		msg := f.MakeRuleMessage()
+		log.Println(msg)
+		chat.SendQQMessage(msg)
 	}
 
 }

@@ -198,14 +198,29 @@ type Filter struct {
 }
 
 func (f *Filter) CheckActive(m *Match) {
-	if !f.Inactive &&
-		m.Min == 30 &&
-		m.Score() == 0 &&
-		f.Rule == RULE_HALF_05 {
-		f.Inactive = true
-		msg := f.MakeRuleMessage()
-		log.Println(msg)
-		chat.SendQQMessage(msg)
+	if f.Inactive {
+		switch f.Rule {
+		case RULE_HALF_05:
+			if m.Min == 30 &&
+				m.Score() == 0 {
+				f.Inactive = false
+				f.Update("inactive")
+				msg := f.MakeRuleMessage()
+				log.Println(msg)
+				chat.SendQQMessage(msg)
+			}
+		case RULE_HALF_EQ:
+			if m.Min >= 20 &&
+				m.State == STATUS_FIRSTHALF &&
+				m.Score() == 0 && m.HalfSize < 0.51 && m.HalfSizeBig > 1.9 {
+				f.Inactive = false
+				f.Update("inactive")
+				msg := f.MakeRuleMessage()
+				log.Println(msg)
+				chat.SendQQMessage(msg)
+			}
+		}
+
 	}
 }
 
