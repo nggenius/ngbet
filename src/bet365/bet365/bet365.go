@@ -225,7 +225,9 @@ func (b *Bet365) process() {
 
 			b.addMatch(match)
 			match.Insert()
-			log.Printf("[新增] %s %s", match.LeagueName, match.TeamName)
+			msg := fmt.Sprintf("[新增] %s %s", match.LeagueName, match.TeamName)
+			log.Println(msg)
+			chat.SendQQMessage(msg, "天气预报")
 			continue
 		}
 
@@ -253,7 +255,9 @@ func (b *Bet365) process() {
 			if match, ok := b.matchs[it]; ok {
 				delete(b.matchs, it)
 				delete(b.filter, it)
-				log.Println("[删除]", match.LeagueName, match.TeamName, State(match.State))
+				msg := fmt.Sprintf("[删除] %s %s %d-%d %s", match.LeagueName, match.TeamName, match.HoScore, match.GuScore, State(match.State))
+				log.Println(msg)
+				//chat.SendQQMessage(msg, "天气预报")
 			}
 		}
 	}
@@ -275,7 +279,7 @@ func (b *Bet365) CheckOdd() {
 				f.WaitOdd = false
 				f.Update("wait_odd")
 				msg := f.MakeNoticeOdd()
-				chat.SendQQMessage(msg)
+				chat.SendQQMessage(msg, "交流群")
 			}
 		}
 	}
@@ -306,10 +310,19 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 			b.rulehalfeq(m)
 		}
 		b.CheckBlack(m)
+		msg := fmt.Sprintf("[%s] %s %s %d-%d", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore)
+		log.Println(msg)
+		chat.SendQQMessage(msg, "天气预报")
 	case EVENT_GOAL:
 		b.CheckRed(m)
+		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		log.Println(msg)
+		chat.SendQQMessage(msg, "天气预报")
 	case EVENT_CANCEL_GOAL:
 		b.ResetRed(m)
+		msg := fmt.Sprintf("[无效] %s %s %d:%d %d-%d", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		log.Println(msg)
+		chat.SendQQMessage(msg, "天气预报")
 	}
 }
 
@@ -322,7 +335,7 @@ func (b *Bet365) CheckRed(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg)
+					chat.SendQQMessage(msg, "交流群")
 				}
 			}
 		}
@@ -338,7 +351,7 @@ func (b *Bet365) ResetRed(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(true, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg)
+					chat.SendQQMessage(msg, "交流群")
 				}
 			}
 		}
@@ -358,7 +371,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg)
+					chat.SendQQMessage(msg, "交流群")
 				}
 			}
 
@@ -372,7 +385,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg)
+					chat.SendQQMessage(msg, "交流群")
 				}
 			}
 		}
@@ -420,7 +433,7 @@ func (b *Bet365) rulehalfeq(m *Match) {
 			b.filter[m.It][f.Rule] = f
 			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。", m.LeagueName, m.TeamName)
 			log.Println(msg)
-			chat.SendQQMessage(msg)
+			chat.SendQQMessage(msg, "交流群")
 		}
 	}
 
@@ -453,7 +466,7 @@ func (b *Bet365) rulehalf05(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg)
+		chat.SendQQMessage(msg, "交流群")
 	}
 
 }
@@ -475,7 +488,7 @@ func (b *Bet365) rule334(m *Match) {
 	b.filter[m.It][f.Rule] = f
 	msg := f.MakeRuleMessage()
 	log.Println(msg)
-	chat.SendQQMessage(msg)
+	chat.SendQQMessage(msg, "交流群")
 }
 
 func (b *Bet365) rule7091(m *Match) {
@@ -501,7 +514,7 @@ func (b *Bet365) rule7091(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg)
+		chat.SendQQMessage(msg, "交流群")
 	}
 }
 
@@ -523,7 +536,7 @@ func (b *Bet365) rule757(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg)
+		chat.SendQQMessage(msg, "交流群")
 	}
 }
 
@@ -536,7 +549,7 @@ func Run(addr string, origin string, getcookieurl string) {
 
 	engine.Sync2(new(Match), new(Filter), new(SnapShot))
 
-	chat.SendQQMessage("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式")
+	chat.SendQQMessage("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式", "交流群")
 	bet := NewBet365()
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)

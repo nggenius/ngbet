@@ -207,7 +207,7 @@ func (f *Filter) CheckActive(m *Match) {
 				f.Update("inactive")
 				msg := f.MakeRuleMessage()
 				log.Println(msg)
-				chat.SendQQMessage(msg)
+				chat.SendQQMessage(msg, "交流群")
 			}
 		case RULE_HALF_EQ:
 			if m.Min >= 20 &&
@@ -217,7 +217,7 @@ func (f *Filter) CheckActive(m *Match) {
 				f.Update("inactive")
 				msg := f.MakeRuleMessage()
 				log.Println(msg)
-				chat.SendQQMessage(msg)
+				chat.SendQQMessage(msg, "交流群")
 			}
 		}
 
@@ -455,7 +455,7 @@ func (m *Match) Insert() {
 }
 
 func (m *Match) String() string {
-	return fmt.Sprintf("%s %s %d-%d 比分:%d-%d \n\t胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t初盘：胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t 上半场 胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f",
+	return fmt.Sprintf("%s %s %d:%d 比分:%d-%d \n\t胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t初盘：胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t 上半场 胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f",
 		m.LeagueName, m.TeamName,
 		m.Min, m.Sec,
 		m.HoScore, m.GuScore,

@@ -12,8 +12,8 @@ var (
 )
 
 // 发送QQ消息
-func SendQQMessage(msg string) {
-	cmd := exec.Command("qq", "send", "group", "交流群", msg)
+func SendQQMessage(msg string, group string) {
+	cmd := exec.Command("qq", "send", "group", group, msg)
 	cmd.Run()
 }
 
