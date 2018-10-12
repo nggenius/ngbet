@@ -19,7 +19,7 @@ var (
 	}
 
 	Let        = [9]float64{0, -0.25, -0.5, -0.75, -1, -1.25, -1.5, -1.75, -2}
-	LetStr     = [9]string{"平手", "平手/半球", "半球", "半球/一球", "一球", "一球/半球", "一球半", "一球半/两球", "两球"}
+	LetStr     = [9]string{"平手", "平手/半球", "半球", "半球/一球", "一球", "一球/球半", "球半", "球半/两球", "两球"}
 	Water      = [15]float64{0.75, 0.775, 0.8, 0.825, 0.85, 0.875, 0.9, 0.925, 0.95, 0.975, 1, 1.025, 1.05, 1.075, 1.1}
 	water_min  = 0.75
 	water_max  = 1.1
@@ -35,13 +35,15 @@ func main() {
 	var odd float64
 	fmt.Scanf("%f\n", &odd)
 	//fmt.Println("input", odd)
-	//odd = 2.6
+	//odd = 1.41
 	for odd > 0 {
+
 		for k1, l := range Odds {
 
 			if odd < l[0]-0.01 || odd > l[14]+0.05 {
 				continue
 			}
+
 			pos := -1
 			for k, od := range l {
 				if od < odd || equal(od, odd) {

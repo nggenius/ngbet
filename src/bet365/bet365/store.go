@@ -212,7 +212,8 @@ func (f *Filter) CheckActive(m *Match) {
 		case RULE_HALF_EQ:
 			if m.Min >= 20 &&
 				m.State == STATUS_FIRSTHALF &&
-				m.Score() == 0 && m.HalfSize < 0.51 && m.HalfSizeBig > 1.9 {
+				m.Score() == 0 && m.HalfSize < 0.51 && m.HalfSizeBig > 1.9 &&
+				math.Abs(m.HalfLet) > 0.24 {
 				f.Inactive = false
 				f.Update("inactive")
 				msg := f.MakeRuleMessage()
@@ -452,6 +453,18 @@ func (m *Match) Insert() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (m *Match) Preview() string {
+	return fmt.Sprintf("%s \n%s  \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n上半场: \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f",
+		m.LeagueName, m.TeamName,
+		m.FirstAvgHm, m.FirstAvgEq, m.FirstAvgAw,
+		m.FirstLet, m.FirstLetHm, m.FirstLetAw,
+		m.FirstSize, m.FirstSizeBig, m.FirstSizeSma,
+		m.HalfAvgHm, m.HalfAvgEq, m.HalfAvgAw,
+		m.HalfLet, m.HalfLetHm, m.HalfLetAw,
+		m.HalfSize, m.HalfSizeBig, m.HalfSizeSma,
+	)
 }
 
 func (m *Match) String() string {

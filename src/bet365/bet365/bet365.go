@@ -228,6 +228,7 @@ func (b *Bet365) process() {
 			msg := fmt.Sprintf("[新增] %s %s", match.LeagueName, match.TeamName)
 			log.Println(msg)
 			chat.SendQQMessage(msg, "天气预报")
+			chat.SendQQMessage(match.Preview(), "天气预报")
 			continue
 		}
 
@@ -310,12 +311,14 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 			b.rulehalfeq(m)
 		}
 		b.CheckBlack(m)
-		msg := fmt.Sprintf("[%s] %s %s %d-%d", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore)
-		log.Println(msg)
-		chat.SendQQMessage(msg, "天气预报")
+		if m.State != STATUS_UNKNOWN {
+			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall())
+			log.Println(msg)
+			chat.SendQQMessage(msg, "天气预报")
+		}
 	case EVENT_GOAL:
 		b.CheckRed(m)
-		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall())
 		log.Println(msg)
 		chat.SendQQMessage(msg, "天气预报")
 	case EVENT_CANCEL_GOAL:
@@ -425,7 +428,7 @@ func (b *Bet365) rulehalfeq(m *Match) {
 
 	if m.AvgEq > 3.0 && m.AvgEq < 3.7 {
 		avgeq := m.AvgEq * 0.618
-		if m.HalfAvgEq > 2.05 && m.HalfAvgEq-avgeq > 0.15 {
+		if m.HalfAvgEq > 2.05 && m.HalfAvgEq-avgeq > 0.15 && math.Abs(m.HalfLet) > 0.24 {
 			f.HalfState = STATUS_FIRSTHALF
 			f.FilterState = FILTER_STATE_NONE
 			f.CopyFromMatch(m)
