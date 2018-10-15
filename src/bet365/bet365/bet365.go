@@ -227,8 +227,8 @@ func (b *Bet365) process() {
 			match.Insert()
 			msg := fmt.Sprintf("[新增] %s %s", match.LeagueName, match.TeamName)
 			log.Println(msg)
-			chat.SendQQMessage(msg, "天气预报")
-			chat.SendQQMessage(match.Preview(), "天气预报")
+			chat.SendToBroadcast(msg)
+			chat.SendToBroadcast(match.Preview())
 			continue
 		}
 
@@ -280,7 +280,7 @@ func (b *Bet365) CheckOdd() {
 				f.WaitOdd = false
 				f.Update("wait_odd")
 				msg := f.MakeNoticeOdd()
-				chat.SendQQMessage(msg, "交流群")
+				chat.SendToRecommend(msg)
 			}
 		}
 	}
@@ -314,18 +314,18 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 		if m.State != STATUS_UNKNOWN {
 			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall())
 			log.Println(msg)
-			chat.SendQQMessage(msg, "天气预报")
+			chat.SendToBroadcast(msg)
 		}
 	case EVENT_GOAL:
 		b.CheckRed(m)
 		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall())
 		log.Println(msg)
-		chat.SendQQMessage(msg, "天气预报")
+		chat.SendToBroadcast(msg)
 	case EVENT_CANCEL_GOAL:
 		b.ResetRed(m)
 		msg := fmt.Sprintf("[无效] %s %s %d:%d %d-%d", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
 		log.Println(msg)
-		chat.SendQQMessage(msg, "天气预报")
+		chat.SendToBroadcast(msg)
 	}
 }
 
@@ -338,7 +338,7 @@ func (b *Bet365) CheckRed(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg, "交流群")
+					chat.SendToRecommend(msg)
 				}
 			}
 		}
@@ -354,7 +354,7 @@ func (b *Bet365) ResetRed(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(true, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg, "交流群")
+					chat.SendToRecommend(msg)
 				}
 			}
 		}
@@ -374,7 +374,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg, "交流群")
+					chat.SendToRecommend(msg)
 				}
 			}
 
@@ -388,7 +388,7 @@ func (b *Bet365) CheckBlack(m *Match) {
 					v.Update("filter_state")
 					msg := v.MakeResultMessage(false, m)
 					log.Println(msg)
-					chat.SendQQMessage(msg, "交流群")
+					chat.SendToRecommend(msg)
 				}
 			}
 		}
@@ -436,7 +436,7 @@ func (b *Bet365) rulehalfeq(m *Match) {
 			b.filter[m.It][f.Rule] = f
 			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。", m.LeagueName, m.TeamName)
 			log.Println(msg)
-			chat.SendQQMessage(msg, "交流群")
+			chat.SendToRecommend(msg)
 		}
 	}
 
@@ -469,7 +469,7 @@ func (b *Bet365) rulehalf05(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg, "交流群")
+		chat.SendToRecommend(msg)
 	}
 
 }
@@ -491,7 +491,7 @@ func (b *Bet365) rule334(m *Match) {
 	b.filter[m.It][f.Rule] = f
 	msg := f.MakeRuleMessage()
 	log.Println(msg)
-	chat.SendQQMessage(msg, "交流群")
+	chat.SendToRecommend(msg)
 }
 
 func (b *Bet365) rule7091(m *Match) {
@@ -517,7 +517,7 @@ func (b *Bet365) rule7091(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg, "交流群")
+		chat.SendToRecommend(msg)
 	}
 }
 
@@ -539,7 +539,7 @@ func (b *Bet365) rule757(m *Match) {
 		b.filter[m.It][f.Rule] = f
 		msg := f.MakeRuleMessage()
 		log.Println(msg)
-		chat.SendQQMessage(msg, "交流群")
+		chat.SendToRecommend(msg)
 	}
 }
 
@@ -552,7 +552,7 @@ func Run(addr string, origin string, getcookieurl string) {
 
 	engine.Sync2(new(Match), new(Filter), new(SnapShot))
 
-	chat.SendQQMessage("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式", "交流群")
+	chat.SendToRecommend("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式")
 	bet := NewBet365()
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)

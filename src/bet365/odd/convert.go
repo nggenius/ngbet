@@ -3,6 +3,7 @@ package odd
 import (
 	"fmt"
 	"math"
+	"strconv"
 )
 
 var (
@@ -28,6 +29,15 @@ var (
 
 func equal(a, b float64) bool {
 	return math.Dim(a, b) < 0.000001
+}
+
+func GetOddStr(odds string) []string {
+	odd, err := strconv.ParseFloat(odds, 64)
+	if err != nil {
+		return []string{err.Error()}
+	}
+
+	return GetOdd(odd)
 }
 
 func GetOdd(odd float64) []string {

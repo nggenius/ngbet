@@ -2,6 +2,7 @@ package main
 
 import (
 	"bet365/bet365"
+	"config"
 	"controller"
 	"html/template"
 
@@ -35,6 +36,7 @@ func Serv() {
 	t.Get("/lucky", new(controller.Lucky))
 	t.Get("/update", new(controller.Update))
 	t.Get("/odd/:odd", new(controller.Odd))
+	t.Post("/qqbot", new(controller.QQBridge))
 	t.Run(8888)
 }
 
@@ -44,7 +46,7 @@ func main() {
 	// 	go ybf.Run()
 	// 	return nil
 	// })
-
+	config.LoadConfig()
 	go Serv()
 	go bet365.Run("premws-pt3.365pushodds.com", "https://www.348365365.com", "https://www.348365365.com")
 

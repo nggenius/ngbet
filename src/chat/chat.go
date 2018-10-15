@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"config"
 	"os/exec"
 
 	"github.com/songtianyi/rrframework/logs"
@@ -10,6 +11,18 @@ import (
 var (
 	session *wxweb.Session
 )
+
+func SendToRecommend(msg string) {
+	for _, g := range config.Setting.Recommend {
+		SendQQMessage(msg, g)
+	}
+}
+
+func SendToBroadcast(msg string) {
+	for _, g := range config.Setting.Broadcast {
+		SendQQMessage(msg, g)
+	}
+}
 
 // 发送QQ消息
 func SendQQMessage(msg string, group string) {

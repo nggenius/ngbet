@@ -216,9 +216,9 @@ func histroy(update bool) []History {
 		}
 
 		hd.ParseAll()
-		if hd.Data[0].history.Expect > loadHistory[0].Expect {
+		if len(loadHistory) == 0 || hd.Data[0].history.Expect > loadHistory[0].Expect {
 			for k := len(hd.Data) - 1; k >= 0; k-- {
-				if hd.Data[k].history.Expect > loadHistory[0].Expect {
+				if len(loadHistory) == 0 || hd.Data[k].history.Expect > loadHistory[0].Expect {
 					loadHistory = append(loadHistory, hd.Data[k].history)
 					copy(loadHistory[1:], loadHistory[0:])
 					loadHistory[0] = hd.Data[k].history
@@ -259,6 +259,15 @@ type Result struct {
 
 func (l *Lucky) Get() interface{} {
 	l.Ctx.Header().Add("Access-Control-Allow-Origin", "*") //允许访问所有域
+	res := Millionaire()
+	return map[string]interface{}{
+		"Status": res.Status,
+		"Last":   res.Last,
+		"Lucky":  res.Lucky,
+	}
+}
+
+func Millionaire() (res Result) {
 	redRatio := make(BallRatio, 33)
 	blueRatio := make(BallRatio, 16)
 	loadHistory := histroy(false)
@@ -267,7 +276,6 @@ func (l *Lucky) Get() interface{} {
 	copy(r[:], loadHistory[0].Red[:])
 	b := loadHistory[0].Blue
 
-	var res Result
 	res.Status = 200
 	res.Last = loadHistory[0]
 
@@ -343,10 +351,5 @@ func (l *Lucky) Get() interface{} {
 	copy(lucky.Red[:], specialRed[:])
 	lucky.Blue = blueRatio[b1[0]].Ball
 	res.Lucky = append(res.Lucky, lucky)
-
-	return map[string]interface{}{
-		"Status": res.Status,
-		"Last":   res.Last,
-		"Lucky":  res.Lucky,
-	}
+	return
 }

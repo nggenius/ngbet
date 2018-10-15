@@ -207,7 +207,7 @@ func (f *Filter) CheckActive(m *Match) {
 				f.Update("inactive")
 				msg := f.MakeRuleMessage()
 				log.Println(msg)
-				chat.SendQQMessage(msg, "交流群")
+				chat.SendToRecommend(msg)
 			}
 		case RULE_HALF_EQ:
 			if m.Min >= 20 &&
@@ -218,7 +218,7 @@ func (f *Filter) CheckActive(m *Match) {
 				f.Update("inactive")
 				msg := f.MakeRuleMessage()
 				log.Println(msg)
-				chat.SendQQMessage(msg, "交流群")
+				chat.SendToRecommend(msg)
 			}
 		}
 
