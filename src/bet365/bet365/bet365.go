@@ -280,7 +280,7 @@ func (b *Bet365) CheckNotify(m *Match) {
 			case WAIT_FULL_SIZE:
 				if m.State == STATUS_SECONDHALF && m.Size <= n.WaitSize+0.01 &&
 					m.SizeBig >= n.WaitBig {
-					msg := fmt.Sprintf("@%s\n%s\n%s\n全场场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.Size, m.SizeBig)
+					msg := fmt.Sprintf("@%s\n%s\n%s\n全场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.Size, m.SizeBig)
 					chat.SendQQMessage(msg, n.Group)
 					l.Remove(e)
 				}
@@ -427,18 +427,18 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 	case EVENT_CHANGE_STATE:
 		b.CheckBlack(m)
 		if m.State != STATUS_UNKNOWN {
-			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall())
+			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%\nid:%s", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall(), m.It)
 			log.Println(msg)
 			chat.SendToBroadcast(msg)
 		}
 	case EVENT_GOAL:
 		b.CheckRed(m)
-		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall())
+		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%\nid:%s", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall(), m.It)
 		log.Println(msg)
 		chat.SendToBroadcast(msg)
 	case EVENT_CANCEL_GOAL:
 		b.ResetRed(m)
-		msg := fmt.Sprintf("[无效] %s %s %d:%d %d-%d", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		msg := fmt.Sprintf("[无效] %s %s %d:%d %d-%d \nid:%s", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.It)
 		log.Println(msg)
 		chat.SendToBroadcast(msg)
 	}
