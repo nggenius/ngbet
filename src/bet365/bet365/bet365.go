@@ -3,10 +3,13 @@ package bet365
 import (
 	"bytes"
 	"chat"
+	"config"
+	"container/list"
 	"fmt"
 	"log"
 	"math"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -37,6 +40,12 @@ const (
 	RULE_HALF_EQ = "halfeq"
 )
 
+const (
+	WAIT_TIME      = 1
+	WAIT_HALF_SIZE = 2 // 半场大小
+	WAIT_FULL_SIZE = 3 // 全场大小
+)
+
 var (
 	FT_RESULT   = 1777  // 全场胜平负
 	FT_HANDICAP = 10147 // 全场亚洲让分盘
@@ -59,11 +68,13 @@ const (
 )
 
 type Bet365 struct {
+	lock    sync.Mutex
 	conn    *bet365conn
 	data    *Bet365Data
 	sendovm bool
 	matchs  map[string]*Match
 	filter  map[string]map[string]*Filter
+	notify  map[string]*list.List
 }
 
 func State(s int) string {
@@ -85,6 +96,15 @@ func State(s int) string {
 	}
 }
 
+type Notify struct {
+	Group    string
+	Member   string
+	WaitType int
+	WaitTime int
+	WaitSize float64
+	WaitBig  float64
+}
+
 func NewBet365() *Bet365 {
 	b := new(Bet365)
 	b.data = NewBet365Data("")
@@ -95,6 +115,7 @@ func NewBet365() *Bet365 {
 	b.conn = new(bet365conn)
 	b.matchs = make(map[string]*Match)
 	b.filter = make(map[string]map[string]*Filter)
+	b.notify = make(map[string]*list.List)
 	return b
 }
 
@@ -183,6 +204,13 @@ func matchTime(lt time.Time, timestamp time.Time, tu, tm, ts string) (m, s int) 
 	return
 }
 
+func (b *Bet365) Match(it string) *Match {
+	if m, ok := b.matchs[it]; ok {
+		return m
+	}
+	return nil
+}
+
 func (b *Bet365) addMatch(m *Match) {
 	b.matchs[m.It] = m
 	if _, ok := b.filter[m.It]; !ok {
@@ -191,6 +219,70 @@ func (b *Bet365) addMatch(m *Match) {
 			f := new(Filter)
 			if f.LoadFromDB(m.It, r) {
 				b.filter[m.It][r] = f
+			}
+		}
+	}
+
+	if _, ok := b.notify[m.It]; !ok {
+		b.notify[m.It] = list.New()
+	}
+}
+
+func (b *Bet365) AddNotify(group, member string, it string, typ int, time int, size float64, big float64) string {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+	n := new(Notify)
+	n.Group = group
+	n.Member = member
+	n.WaitType = typ
+	n.WaitSize = size
+	n.WaitBig = big
+	if l, ok := b.notify[it]; ok {
+		m := b.Match(it)
+		if m == nil {
+			return "[error] 通知增加失败，比赛没有找到"
+		}
+		if n.WaitType != WAIT_TIME {
+			if m.State == STATUS_FIRSTHALF {
+				n.WaitType = WAIT_HALF_SIZE
+			} else {
+				n.WaitType = WAIT_FULL_SIZE
+			}
+		}
+		l.PushBack(n)
+		return fmt.Sprintf("增加 %s %s 通知成功", m.LeagueName, m.TeamName)
+	}
+	return "[error] 通知增加失败，比赛没有找到"
+}
+
+func (b *Bet365) CheckNotify(m *Match) {
+	if l, ok := b.notify[m.It]; ok {
+		ele := l.Front()
+		for ele != nil {
+			e := ele
+			ele = ele.Next()
+			n := e.Value.(*Notify)
+			switch n.WaitType {
+			case WAIT_TIME:
+				if m.Min >= n.WaitTime {
+					msg := fmt.Sprintf("@%s\n%s\n%s\n当前时间[%d:%d]", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec)
+					chat.SendQQMessage(msg, n.Group)
+					l.Remove(e)
+				}
+			case WAIT_HALF_SIZE:
+				if m.State == STATUS_FIRSTHALF && m.HalfSize <= n.WaitSize+0.01 &&
+					m.HalfSizeBig >= n.WaitBig {
+					msg := fmt.Sprintf("@%s\n%s\n%s\n上半场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.HalfSize, m.HalfSizeBig)
+					chat.SendQQMessage(msg, n.Group)
+					l.Remove(e)
+				}
+			case WAIT_FULL_SIZE:
+				if m.State == STATUS_SECONDHALF && m.Size <= n.WaitSize+0.01 &&
+					m.SizeBig >= n.WaitBig {
+					msg := fmt.Sprintf("@%s\n%s\n%s\n全场场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.Size, m.SizeBig)
+					chat.SendQQMessage(msg, n.Group)
+					l.Remove(e)
+				}
 			}
 		}
 	}
@@ -244,9 +336,12 @@ func (b *Bet365) process() {
 				b.Filter(match)
 				b.CheckActive(match)
 			default:
+				b.StateFilter(e, match)
 				b.CheckFilter(e, match)
 			}
 		}
+
+		b.CheckNotify(match)
 
 	}
 
@@ -256,6 +351,9 @@ func (b *Bet365) process() {
 			if match, ok := b.matchs[it]; ok {
 				delete(b.matchs, it)
 				delete(b.filter, it)
+				if match.State == STATUS_COMPLETE {
+					delete(b.notify, it)
+				}
 				msg := fmt.Sprintf("[删除] %s %s %d-%d %s", match.LeagueName, match.TeamName, match.HoScore, match.GuScore, State(match.State))
 				log.Println(msg)
 				//chat.SendQQMessage(msg, "天气预报")
@@ -304,12 +402,28 @@ func (b *Bet365) Snapshoot(e int, m *Match) {
 	}
 }
 
+func (b *Bet365) StateFilter(e int, m *Match) {
+	switch e {
+	case EVENT_CHANGE_STATE:
+		switch m.State {
+		case STATUS_FIRSTHALF:
+			for k, rs := range config.Setting.Rule.State {
+				if k == "firsthalf" {
+					for _, r := range rs {
+						switch r {
+						case RULE_HALF_EQ:
+							b.rulehalfeq(m)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 func (b *Bet365) CheckFilter(e int, m *Match) {
 	switch e {
 	case EVENT_CHANGE_STATE:
-		if m.State == STATUS_FIRSTHALF {
-			b.rulehalfeq(m)
-		}
 		b.CheckBlack(m)
 		if m.State != STATUS_UNKNOWN {
 			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall())
@@ -396,10 +510,18 @@ func (b *Bet365) CheckBlack(m *Match) {
 }
 
 func (b *Bet365) Filter(m *Match) {
-	b.rulehalf05(m)
-	b.rule334(m)
-	b.rule7091(m)
-	b.rule757(m)
+	for _, r := range config.Setting.Rule.Update {
+		switch r {
+		case RULE_HALF_05:
+			b.rulehalf05(m)
+		case RULE_334:
+			b.rule334(m)
+		case RULE_7091:
+			b.rule7091(m)
+		case RULE_757:
+			b.rule757(m)
+		}
+	}
 }
 
 func (b *Bet365) CheckActive(m *Match) {
@@ -434,7 +556,7 @@ func (b *Bet365) rulehalfeq(m *Match) {
 			f.CopyFromMatch(m)
 			f.Insert()
 			b.filter[m.It][f.Rule] = f
-			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。", m.LeagueName, m.TeamName)
+			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。\nid:%s", m.LeagueName, m.TeamName, m.It)
 			log.Println(msg)
 			chat.SendToRecommend(msg)
 		}
@@ -543,6 +665,30 @@ func (b *Bet365) rule757(m *Match) {
 	}
 }
 
+var (
+	bet *Bet365
+)
+
+func AddTimeNotify(group, member string, it string, time string) string {
+	i, err := strconv.Atoi(time)
+	if err != nil {
+		return err.Error()
+	}
+	return bet.AddNotify(group, member, it, WAIT_TIME, i, 0, 0)
+}
+
+func AddSizeNotify(group, member string, it string, size, big string) string {
+	fsize, err := strconv.ParseFloat(size, 64)
+	if err != nil {
+		return err.Error()
+	}
+	fbig, err := strconv.ParseFloat(big, 64)
+	if err != nil {
+		return err.Error()
+	}
+	return bet.AddNotify(group, member, it, -1, 0, fsize, fbig)
+}
+
 func Run(addr string, origin string, getcookieurl string) {
 	var err error
 	engine, err = xorm.NewEngine("sqlite3", "./bet365.db")
@@ -552,8 +698,8 @@ func Run(addr string, origin string, getcookieurl string) {
 
 	engine.Sync2(new(Match), new(Filter), new(SnapShot))
 
-	chat.SendToRecommend("初始化，数据源:365, 规则:334, 7091, 757, half0.5(测试) 测试模式")
-	bet := NewBet365()
+	chat.SendToRecommend("初始化")
+	bet = NewBet365()
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)
 		if err != nil {

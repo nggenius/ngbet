@@ -3,13 +3,20 @@ package chat
 import (
 	"config"
 	"os/exec"
+	"time"
 
 	"github.com/songtianyi/rrframework/logs"
 	"github.com/songtianyi/wechat-go/wxweb"
 )
 
+type msginfo struct {
+	msg   string
+	group string
+}
+
 var (
-	session *wxweb.Session
+	session  *wxweb.Session
+	msgqueue = make(chan *msginfo, 128)
 )
 
 func SendToRecommend(msg string) {
@@ -26,8 +33,22 @@ func SendToBroadcast(msg string) {
 
 // 发送QQ消息
 func SendQQMessage(msg string, group string) {
-	cmd := exec.Command("qq", "send", "group", group, msg)
-	cmd.Run()
+	m := &msginfo{msg, group}
+	select {
+	case msgqueue <- m:
+	default:
+	}
+}
+
+func MessageLoop() {
+	for {
+		select {
+		case m := <-msgqueue:
+			cmd := exec.Command("qq", "send", "group", m.group, m.msg)
+			cmd.Run()
+			time.Sleep(time.Millisecond * 10)
+		}
+	}
 }
 
 // 发送微信消息

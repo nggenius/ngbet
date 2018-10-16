@@ -2,10 +2,13 @@ package main
 
 import (
 	"bet365/bet365"
+	"chat"
 	"config"
 	"controller"
 	"html/template"
+	"os"
 
+	"github.com/lunny/log"
 	"github.com/lunny/tango"
 	"github.com/mysll/toolkit"
 	"github.com/tango-contrib/events"
@@ -13,7 +16,9 @@ import (
 )
 
 func Serv() {
-	t := tango.Classic()
+	l := log.New(os.Stdout, "[tango] ", log.Ldefault())
+	l.SetOutputLevel(log.Lfatal)
+	t := tango.Classic(l)
 	t.Use(
 		events.Events(),
 		tango.Static(tango.StaticOptions{
@@ -41,14 +46,9 @@ func Serv() {
 }
 
 func main() {
-	// go chat.Run(func() error {
-	// 	chat.SendMessage("微信接入成功")
-	// 	go ybf.Run()
-	// 	return nil
-	// })
 	config.LoadConfig()
 	go Serv()
-	go bet365.Run("premws-pt3.365pushodds.com", "https://www.348365365.com", "https://www.348365365.com")
-
+	go bet365.Run(config.Setting.Bet365.WSURL, config.Setting.Bet365.Host, config.Setting.Bet365.Host)
+	go chat.MessageLoop()
 	toolkit.WaitForQuit()
 }

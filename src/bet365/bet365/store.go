@@ -269,7 +269,7 @@ func (f *Filter) MakeRuleMessage() string {
 	} else {
 		half = "全场"
 	}
-	s := fmt.Sprintf("/足球[%s] \n%s \n%s \n当前比分:%d-%d\n平局概率:%d%%\n推荐:%s大%.1f", f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore)
+	s := fmt.Sprintf("/足球[%s] \n%s \n%s \n当前比分:%d-%d\n平局概率:%d%%\n推荐:%s大%.1f\nid:%s", f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
 	if f.HalfState == STATUS_SECONDHALF && f.Size-rescore > 0.1 { // 当前盘比目标盘大
 		f.WaitOdd = true
 		s += fmt.Sprintf("\n/闪电注意：当前盘口(%.2f)高于推荐盘口,可等水", f.Size)
@@ -278,7 +278,7 @@ func (f *Filter) MakeRuleMessage() string {
 }
 
 func (f *Filter) MakeNoticeOdd() string {
-	return fmt.Sprintf("/开车[%s]\n%s\n%s\n降盘啦，快上车", f.Rule, f.LeagueName, f.TeamName)
+	return fmt.Sprintf("/开车[%s]\n%s\n%s\n降盘啦，快上车\nid:%s", f.Rule, f.LeagueName, f.TeamName, f.It)
 }
 
 func (f *Filter) Insert() {
@@ -456,7 +456,7 @@ func (m *Match) Insert() {
 }
 
 func (m *Match) Preview() string {
-	return fmt.Sprintf("%s \n%s  \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n上半场: \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f",
+	return fmt.Sprintf("%s \n%s  \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n上半场: \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n\tid:%s",
 		m.LeagueName, m.TeamName,
 		m.FirstAvgHm, m.FirstAvgEq, m.FirstAvgAw,
 		m.FirstLet, m.FirstLetHm, m.FirstLetAw,
@@ -464,6 +464,7 @@ func (m *Match) Preview() string {
 		m.HalfAvgHm, m.HalfAvgEq, m.HalfAvgAw,
 		m.HalfLet, m.HalfLetHm, m.HalfLetAw,
 		m.HalfSize, m.HalfSizeBig, m.HalfSizeSma,
+		m.It,
 	)
 }
 
