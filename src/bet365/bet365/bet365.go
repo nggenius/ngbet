@@ -235,6 +235,7 @@ func (b *Bet365) AddNotify(group, member string, it string, typ int, time int, s
 	n.Group = group
 	n.Member = member
 	n.WaitType = typ
+	n.WaitTime = time
 	n.WaitSize = size
 	n.WaitBig = big
 	if l, ok := b.notify[it]; ok {

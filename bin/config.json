@@ -1,8 +1,23 @@
 {
-    "recommend":[
+    "bet365": {
+        "wsurl": "premws-pt3.365pushodds.com",
+        "host": "https://www.348365365.com"
+    },
+    "recommend": [
         "交流群"
     ],
-    "broadcast":[
+    "broadcast": [
         "天气预报"
-    ]
+    ],
+    "rule": {
+        "update": [
+            "334",
+            "7091",
+            "757",
+            "half0.5"
+        ],
+        "state": {
+            "firsthalf": ["halfeq"]
+        }
+    }
 }
