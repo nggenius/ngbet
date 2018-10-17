@@ -79,6 +79,8 @@ func do(values url.Values, cmd string, args []string) string {
 			return "[error] 参数错误， example:size id 0.5 2.5"
 		}
 		return bet365.AddSizeNotify(values.Get("group"), values.Get("from"), args[0], args[1], args[2])
+	case "stat", "统计":
+		return bet365.Stat()
 	default:
 		return "[error]你说什么我听不懂,输入help或者帮助查看所有支持的命令"
 	}

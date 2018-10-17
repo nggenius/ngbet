@@ -194,7 +194,8 @@ type Filter struct {
 	FilterState      int
 	HalfState        int
 	WaitOdd          bool
-	Inactive         bool // 未激活
+	Inactive         bool  // 未激活
+	Created          int64 `xorm:"created"`
 }
 
 func (f *Filter) CheckActive(m *Match) {
