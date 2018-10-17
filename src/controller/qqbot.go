@@ -81,6 +81,15 @@ func do(values url.Values, cmd string, args []string) string {
 		return bet365.AddSizeNotify(values.Get("group"), values.Get("from"), args[0], args[1], args[2])
 	case "stat", "统计":
 		return bet365.Stat()
+	case "订阅":
+		g := values.Get("group")
+		for _, v := range config.Setting.Recommend {
+			if v == g {
+				return "[error] 群名称冲突，请修改群名称"
+			}
+		}
+		config.Setting.Recommend = append(config.Setting.Recommend, g)
+		return "增加订阅成功，将收到比赛推荐信息"
 	default:
 		return "[error]你说什么我听不懂,输入help或者帮助查看所有支持的命令"
 	}
