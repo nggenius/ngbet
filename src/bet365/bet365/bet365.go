@@ -680,22 +680,22 @@ func Stat() string {
 	result = append(result, "昨日:")
 	for _, v := range RULES {
 		var f Filter
-		total, err := engine.Where("rule=? and created > ? and created < ?", v, lzero.Unix(), l24.Unix()).Count(&f)
+		total, err := engine.Where("rule=? and created > ? and created < ? and Inactive=0", v, lzero.Unix(), l24.Unix()).Count(&f)
 		if err != nil {
 			continue
 		}
-		red, err := engine.Where("rule=? and filter_state=? and created > ? and created < ?", v, FILTER_STATE_RED, lzero.Unix(), l24.Unix()).Count(&f)
+		red, err := engine.Where("rule=? and filter_state=? and created > ? and created < ? and Inactive=0", v, FILTER_STATE_RED, lzero.Unix(), l24.Unix()).Count(&f)
 		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
 	}
 
 	result = append(result, "总评:")
 	for _, v := range RULES {
 		var f Filter
-		total, err := engine.Where("rule=?", v).Count(&f)
+		total, err := engine.Where("rule=? and Inactive=0", v).Count(&f)
 		if err != nil {
 			continue
 		}
-		red, err := engine.Where("rule=? and filter_state=?", v, FILTER_STATE_RED).Count(&f)
+		red, err := engine.Where("rule=? and filter_state=? and Inactive=0", v, FILTER_STATE_RED).Count(&f)
 		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
 	}
 
