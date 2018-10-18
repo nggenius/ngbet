@@ -56,10 +56,24 @@ func do(values url.Values, cmd string, args []string) string {
 		return strings.Join(odds, "\n")
 	case "ssq", "双色球":
 		balls := Millionaire()
-		str := fmt.Sprintf("上期%d:\n %v %d\n", balls.Last.Expect, balls.Last.Red, balls.Last.Blue)
+		str := fmt.Sprintf("上期%d:\n %2d %2d %2d %2d %2d %2d | %2d\n", balls.Last.Expect,
+			balls.Last.Red[0],
+			balls.Last.Red[1],
+			balls.Last.Red[2],
+			balls.Last.Red[3],
+			balls.Last.Red[4],
+			balls.Last.Red[5],
+			balls.Last.Blue)
 		str += "本期推荐:\n"
 		for _, v := range balls.Lucky {
-			str += fmt.Sprintf("  %v %d\n", v.Red, v.Blue)
+			str += fmt.Sprintf("  %2d %2d %2d %2d %2d %2d | %2d\n",
+				v.Red[0],
+				v.Red[1],
+				v.Red[2],
+				v.Red[3],
+				v.Red[4],
+				v.Red[5],
+				v.Blue)
 		}
 		return str
 	case "reload":
