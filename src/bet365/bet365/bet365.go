@@ -677,6 +677,16 @@ func Stat() string {
 	last := n.AddDate(0, 0, -1)
 	lzero, _ := time.Parse("2006-01-02", last.Format("2006-01-02"))
 	l24, _ := time.Parse("2006-01-02", n.Format("2006-01-02"))
+	result = append(result, "今日:")
+	for _, v := range RULES {
+		var f Filter
+		total, err := engine.Where("rule=? and created > ? and Inactive=0", v, l24.Unix()).Count(&f)
+		if err != nil {
+			continue
+		}
+		red, err := engine.Where("rule=? and filter_state=? and created > ? and Inactive=0", v, FILTER_STATE_RED, l24.Unix()).Count(&f)
+		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
+	}
 	result = append(result, "昨日:")
 	for _, v := range RULES {
 		var f Filter
