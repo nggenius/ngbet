@@ -56,7 +56,7 @@ func do(values url.Values, cmd string, args []string) string {
 		return strings.Join(odds, "\n")
 	case "ssq", "双色球":
 		balls := Millionaire()
-		str := fmt.Sprintf("上期%d:\n %2d %2d %2d %2d %2d %2d | %2d\n", balls.Last.Expect,
+		str := fmt.Sprintf("上期%d:\n %02d %02d %02d %02d %02d %02d | %02d\n", balls.Last.Expect,
 			balls.Last.Red[0],
 			balls.Last.Red[1],
 			balls.Last.Red[2],
@@ -66,7 +66,7 @@ func do(values url.Values, cmd string, args []string) string {
 			balls.Last.Blue)
 		str += "本期推荐:\n"
 		for _, v := range balls.Lucky {
-			str += fmt.Sprintf("  %2d %2d %2d %2d %2d %2d | %2d\n",
+			str += fmt.Sprintf("  %02d %02d %02d %02d %02d %02d | %02d\n",
 				v.Red[0],
 				v.Red[1],
 				v.Red[2],
