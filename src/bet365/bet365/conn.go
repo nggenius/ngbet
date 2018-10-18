@@ -50,6 +50,19 @@ func NewConn() *bet365conn {
 }
 
 func (b *bet365conn) Connect(addr string, origin string, getcookieurl string) error {
+
+	r, err := grequests.Get(getcookieurl, nil)
+	if err != nil {
+		return err
+	}
+	res := r.RawResponse.Cookies()
+	if len(res) == 0 {
+		return fmt.Errorf("get session failed")
+	}
+
+	session := res[1].Value
+	log.Println("Sessionid=" + session)
+
 	var dialer = &websocket.Dialer{
 		Proxy:             http.ProxyFromEnvironment,
 		EnableCompression: true,
@@ -79,13 +92,7 @@ func (b *bet365conn) Connect(addr string, origin string, getcookieurl string) er
 
 	b.c = c
 
-	r, err := grequests.Get(getcookieurl, nil)
-	if err != nil {
-		return err
-	}
-	res := r.RawResponse.Cookies()
-	log.Println("Sessionid=" + res[1].Value)
-	err = b.sendMessage([]byte(genSessionId(res[1].Value)))
+	err = b.sendMessage([]byte(genSessionId(session)))
 	if err != nil {
 		return err
 	}

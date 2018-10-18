@@ -733,22 +733,30 @@ func Run(addr string, origin string, getcookieurl string) {
 
 	chat.SendToRecommend("初始化")
 	bet = NewBet365()
+	delay := time.Second * 3
+	retrys := 0
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)
 		if err != nil {
-			log.Printf("connect %s failed, waiting 3 seconds to retry", addr)
-			time.Sleep(time.Second * 3)
+			log.Printf("connect %s failed, err:%s", addr, err)
+			retrys++
+			if retrys > 3 {
+				delay = delay + time.Second
+				if delay > time.Minute {
+					delay = time.Minute
+				}
+			}
+			time.Sleep(delay)
 			continue
 		}
 
+		retrys = 0
 		//chat.SendQQMessage("连接成功")
 		log.Println("connected")
 		err = bet.work()
 		if err != nil {
 			bet.conn.close()
 			log.Printf("catch err: %s, waiting 3 seconds to reconnect", err)
-			//chat.SendQQMessage("系统异常，3秒后重新连接")
-			time.Sleep(time.Second * 3)
 			continue
 		}
 	}
