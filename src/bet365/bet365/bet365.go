@@ -676,7 +676,7 @@ func Stat() string {
 	n := time.Now()
 	last := n.AddDate(0, 0, -1)
 	lzero, _ := time.Parse("2006-01-02", last.Format("2006-01-02"))
-	l24, _ := time.Parse("2006-01-02", n.Format("2016-01-02"))
+	l24, _ := time.Parse("2006-01-02", n.Format("2006-01-02"))
 	result = append(result, "昨日:")
 	for _, v := range RULES {
 		var f Filter
