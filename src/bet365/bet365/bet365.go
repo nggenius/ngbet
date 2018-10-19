@@ -675,8 +675,8 @@ func Stat() string {
 	var result []string
 	n := time.Now()
 	last := n.AddDate(0, 0, -1)
-	lzero, _ := time.Parse("2006-01-02", last.Format("2006-01-02"))
-	l24, _ := time.Parse("2006-01-02", n.Format("2006-01-02"))
+	lzero, _ := time.ParseInLocation("2006-01-02", last.Format("2006-01-02"), time.Local)
+	l24, _ := time.ParseInLocation("2006-01-02", n.Format("2006-01-02"), time.Local)
 	result = append(result, "今日:")
 	for _, v := range RULES {
 		var f Filter
