@@ -462,9 +462,9 @@ func (m *Match) Preview() string {
 		m.FirstAvgHm, m.FirstAvgEq, m.FirstAvgAw,
 		m.FirstLet, m.FirstLetHm, m.FirstLetAw,
 		m.FirstSize, m.FirstSizeBig, m.FirstSizeSma,
-		m.HalfAvgHm, m.HalfAvgEq, m.HalfAvgAw,
-		m.HalfLet, m.HalfLetHm, m.HalfLetAw,
-		m.HalfSize, m.HalfSizeBig, m.HalfSizeSma,
+		m.HalfFirstAvgHm, m.HalfFirstAvgEq, m.HalfFirstAvgAw,
+		m.HalfFirstLet, m.HalfFirstLetHm, m.HalfFirstLetAw,
+		m.HalfFirstSize, m.HalfFirstSizeBig, m.HalfFirstSizeSma,
 		m.It,
 	)
 }

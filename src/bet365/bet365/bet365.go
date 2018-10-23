@@ -229,6 +229,15 @@ func (b *Bet365) addMatch(m *Match) {
 	}
 }
 
+func (b *Bet365) FirstInfo(it string) string {
+	m := b.Match(it)
+	if m == nil {
+		return "[error] 比赛没有找到"
+	}
+
+	return m.Preview()
+}
+
 func (b *Bet365) AddNotify(group, member string, it string, typ int, time int, size float64, big float64) string {
 	b.lock.Lock()
 	defer b.lock.Unlock()
@@ -730,6 +739,10 @@ func AddSizeNotify(group, member string, it string, size, big string) string {
 		return err.Error()
 	}
 	return bet.AddNotify(group, member, it, -1, 0, fsize, fbig)
+}
+
+func GetFirst(it string) string {
+	return bet.FirstInfo(it)
 }
 
 func Run(addr string, origin string, getcookieurl string) {

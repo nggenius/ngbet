@@ -47,7 +47,7 @@ func parseCommand(content string) (cmd string, args []string) {
 func do(values url.Values, cmd string, args []string) string {
 	switch cmd {
 	case "help", "帮助":
-		return "[所有命令]:\n  [odd|赔率]:返回欧亚转换，odd 1.5\n  [ssq|双色球]:双色球五注\n  [time|定时]:比赛定时提醒，time id 35\n  [size|大球]:大小球提醒，size id 0.5 2.0"
+		return "[所有命令]:\n  [odd|赔率]:返回欧亚转换，odd 1.5\n  [ssq|双色球]:双色球五注\n  [time|定时]:比赛定时提醒，time id 35\n  [size|大球]:大小球提醒，size id 0.5 2.0\n  [first|初盘]:初盘赔率，first id"
 	case "odd", "赔率":
 		if len(args) != 1 {
 			return "[error] 参数错误"
@@ -93,6 +93,11 @@ func do(values url.Values, cmd string, args []string) string {
 			return "[error] 参数错误， example:size id 0.5 2.5"
 		}
 		return bet365.AddSizeNotify(values.Get("group"), values.Get("from"), args[0], args[1], args[2])
+	case "first", "初盘":
+		if len(args) != 1 {
+			return "[error] 参数错误， example:first id"
+		}
+		return bet365.GetFirst(args[0])
 	case "stat", "统计":
 		return bet365.Stat()
 	case "订阅":
