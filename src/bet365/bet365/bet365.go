@@ -39,6 +39,7 @@ const (
 	RULE_757     = "757"
 	RULE_HALF_05 = "half0.5"
 	RULE_HALF_EQ = "halfeq"
+	RULE_LZ_001  = "lz001"
 )
 
 const (
@@ -58,7 +59,7 @@ var (
 	HT_GOALS    = 10171 // 半场大小球
 	HT_ODDS     = []int{HT_RESULT, HT_HANDICAP, HT_GOALS}
 
-	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05, RULE_HALF_EQ}
+	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05, RULE_HALF_EQ, RULE_LZ_001}
 	engine *xorm.Engine
 )
 
@@ -346,6 +347,7 @@ func (b *Bet365) process() {
 			case EVENT_UPDATE_TIME:
 				b.Filter(match)
 				b.CheckActive(match)
+				//log.Println("update:", match.String())
 			default:
 				b.StateFilter(e, match)
 				b.CheckFilter(e, match)
@@ -424,6 +426,17 @@ func (b *Bet365) StateFilter(e int, m *Match) {
 						switch r {
 						case RULE_HALF_EQ:
 							b.rulehalfeq(m)
+						}
+					}
+				}
+			}
+		case STATUS_MIDDLE:
+			for k, rs := range config.Setting.Rule.State {
+				if k == "middle" {
+					for _, r := range rs {
+						switch r {
+						case RULE_LZ_001:
+							b.rulelz(m)
 						}
 					}
 				}
@@ -543,6 +556,29 @@ func (b *Bet365) CheckActive(m *Match) {
 			}
 			v.CheckActive(m)
 		}
+	}
+}
+
+func (b *Bet365) rulelz(m *Match) {
+	// 胜负赔率一样，或者相差一个点
+	// 上半场没球，盘口>=1.5或者<=2
+	if m.State != STATUS_MIDDLE {
+		return
+	}
+
+	if m.Score() == 0 && (m.Size >= 1.5 || m.Size <= 2) {
+		f := new(Filter)
+		f.Rule = RULE_LZ_001
+		if f.LoadFromDB(m.It, f.Rule) {
+			return
+		}
+
+		f.Inactive = true
+		f.HalfState = STATUS_SECONDHALF
+		f.FilterState = FILTER_STATE_NONE
+		f.CopyFromMatch(m)
+		f.Insert()
+		b.filter[m.It][f.Rule] = f
 	}
 }
 

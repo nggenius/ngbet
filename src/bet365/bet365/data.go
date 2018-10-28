@@ -429,6 +429,7 @@ func ParseInPlay(d *Bet365Data, path [][]byte, data []byte) {
 		d.RemoveAllChild(node)
 		parseInPlayNode(d, node, infos[1:])
 		log.Println("recv inplay full data")
+		//log.Println(string(data))
 	case 'U':
 		it := string(path[len(path)-1])
 		log.Fatalln("recv update inplay", it, string(data))
@@ -496,6 +497,7 @@ func ParseOVM(it string, d *Bet365Data, path [][]byte, data []byte) {
 		d.RemoveAllChild(node)
 		parseOVMNode(d, node, infos[1:])
 		log.Println("recv ", it)
+		//log.Println(string(data))
 	case 'U':
 		it := string(path[len(path)-1])
 		node := d.FindNode(it)

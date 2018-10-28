@@ -221,6 +221,20 @@ func (f *Filter) CheckActive(m *Match) {
 				log.Println(msg)
 				chat.SendToRecommend(msg)
 			}
+		case RULE_LZ_001:
+			if m.Min >= 70 {
+				sub := math.Abs(m.AvgHm - m.AvgAw)
+				if sub < 0.001 || (sub > 0.99 && sub < 1.001) {
+					f.Inactive = false
+					f.HoScore = m.HoScore
+					f.GuScore = m.GuScore
+					f.Update("inactive", "ho_score", "gu_score")
+					msg := f.MakeRuleMessage()
+					log.Println(msg)
+					chat.SendToRecommend(msg)
+				}
+
+			}
 		}
 
 	}
@@ -289,8 +303,8 @@ func (f *Filter) Insert() {
 	}
 }
 
-func (f *Filter) Update(col string) {
-	engine.Id(f.Id).Cols(col).Update(f)
+func (f *Filter) Update(col ...string) {
+	engine.Id(f.Id).Cols(col...).Update(f)
 }
 
 func (f *Filter) Score() int {
@@ -640,8 +654,8 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 			switch id {
 			case HT_RESULT: // 胜平负
 				m.HalfAvgHm = odds[ors[0]].Odd()
-				m.HalfAvgEq = odds[ors[1]].Odd()
-				m.HalfAvgAw = odds[ors[2]].Odd()
+				m.HalfAvgAw = odds[ors[1]].Odd()
+				m.HalfAvgEq = odds[ors[2]].Odd()
 			case HT_HANDICAP: // 让球
 				m.HalfLet = odds[ors[0]].Float("HA")
 				m.HalfLetHm = odds[ors[0]].Odd()
@@ -672,8 +686,8 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 		switch id {
 		case FT_RESULT: // 胜平负
 			m.AvgHm = odds[ors[0]].Odd()
-			m.AvgEq = odds[ors[1]].Odd()
-			m.AvgAw = odds[ors[2]].Odd()
+			m.AvgAw = odds[ors[1]].Odd()
+			m.AvgEq = odds[ors[2]].Odd()
 		case FT_HANDICAP: // 让球
 			m.Let = odds[ors[0]].Float("HA")
 			m.LetHm = odds[ors[0]].Odd()
