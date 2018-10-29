@@ -2,7 +2,6 @@ package bet365
 
 import (
 	"bytes"
-	"container/list"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -80,9 +79,8 @@ func split(data []byte) map[string]string {
 }
 
 type Node struct {
-	tag   string
-	child *list.List
-	//child  map[string]*Node
+	tag    string
+	child  map[string]*Node
 	attrs  map[string]string
 	parent *Node
 }
@@ -197,17 +195,11 @@ func (n *Node) Odd() float64 {
 }
 
 func (n *Node) Remove(it string) {
-	for ele := n.child.Front(); ele != nil; ele = ele.Next() {
-		n := ele.Value.(*Node)
-		if n.It() == it {
-			n.child.Remove(ele)
-			return
-		}
-	}
+	delete(n.child, it)
 }
 
 func (n *Node) AddChild(node *Node) {
-	n.child.PushBack(node)
+	n.child[node.It()] = node
 }
 
 func (n *Node) Path() string {
@@ -233,7 +225,7 @@ func NewNode(t string) *Node {
 	n := new(Node)
 	n.tag = t
 	n.attrs = make(map[string]string)
-	n.child = list.New()
+	n.child = make(map[string]*Node)
 	return n
 }
 
@@ -241,7 +233,7 @@ func NewSimpleNode(t string) *Node {
 	n := new(Node)
 	n.tag = t
 	n.attrs = make(map[string]string)
-	n.child = list.New()
+	n.child = make(map[string]*Node)
 	n.attrs["IT"] = t
 	return n
 }
@@ -275,8 +267,8 @@ func (d *Bet365Data) Dump() {
 
 func dump(str *[]string, node *Node) {
 	*str = append(*str, node.String())
-	for e := node.child.Front(); e != nil; e = e.Next() {
-		dump(str, e.Value.(*Node))
+	for _, v := range node.child {
+		dump(str, v)
 	}
 }
 
@@ -352,13 +344,12 @@ func (d *Bet365Data) FindNode(it string) *Node {
 
 func (d *Bet365Data) ChildByType(node *Node, t string) []*Node {
 	var ret []*Node
-	for e := node.child.Front(); e != nil; e = e.Next() {
-		c := e.Value.(*Node)
+	for _, c := range node.child {
 		if c != nil && c.tag == t {
 			ret = append(ret, c)
 		}
 
-		if c.child.Len() > 0 {
+		if len(c.child) > 0 {
 			r1 := d.ChildByType(c, t)
 			if len(r1) > 0 {
 				ret = append(ret, r1...)
@@ -381,11 +372,10 @@ func (d *Bet365Data) AddNode(parent *Node, node *Node) *Node {
 }
 
 func (d *Bet365Data) RemoveAllChild(node *Node) {
-
-	for e := node.child.Front(); e != nil; { // 循环遍历所有子结点
-		cur := e
-		e = e.Next()
-		d.Remove(cur.Value.(*Node).It())
+	for k, v := range node.child { // 循环遍历所有子结点
+		if v != nil {
+			d.Remove(k)
+		}
 	}
 }
 
