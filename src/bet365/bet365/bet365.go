@@ -236,7 +236,7 @@ func (b *Bet365) FirstInfo(it string) string {
 		return "[error] 比赛没有找到"
 	}
 
-	return m.Preview()
+	return m.String()
 }
 
 func (b *Bet365) AddNotify(group, member string, it string, typ int, time int, size float64, big float64) string {

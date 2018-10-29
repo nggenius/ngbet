@@ -242,17 +242,29 @@ func (f *Filter) CheckActive(m *Match) {
 
 func (f *Filter) MakeResultMessage(reset bool, m *Match) string {
 	if reset {
-		return fmt.Sprintf("/流泪 [%s] \n%s \n%s \n[%d:%d] \n进球无效，比分:%d-%d", f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		return fmt.Sprintf(`/流泪 [%s] 
+%s
+%s
+[%02d:%02d] 进球无效，比分:%d-%d`, f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
 	}
 
 	if f.FilterState == FILTER_STATE_RED {
-		return fmt.Sprintf("/红包 [红] [%s] \n%s \n%s \n[%d:%d] /足球 比分:%d-%d", f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		return fmt.Sprintf(`/红包 [红] [%s] 
+%s
+%s
+[%02d:%02d] /足球 比分:%d-%d`, f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
 	}
 	if f.FilterState == FILTER_STATE_BLACK {
 		if f.HalfState == STATUS_FIRSTHALF {
-			return fmt.Sprintf("/炸弹 [黑] [%s] \n%s \n%s  \n上半场结束，比分:%d-%d", f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
+			return fmt.Sprintf(`/炸弹 [黑] [%s] 
+%s
+%s
+上半场结束，比分:%d-%d`, f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
 		}
-		return fmt.Sprintf("/炸弹 [黑] [%s] \n%s \n%s  \n比赛结束，比分:%d-%d", f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
+		return fmt.Sprintf(`/炸弹 [黑] [%s] 
+%s
+%s  
+比赛结束，比分:%d-%d`, f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
 	}
 	return ""
 }
@@ -284,7 +296,13 @@ func (f *Filter) MakeRuleMessage() string {
 	} else {
 		half = "全场"
 	}
-	s := fmt.Sprintf("/足球[%s] \n%s \n%s \n当前比分:%d-%d\n平局概率:%d%%\n推荐:%s大%.1f\nid:%s", f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
+	s := fmt.Sprintf(`/足球[%s] 
+%s
+%s
+当前比分:%d-%d
+平局概率:%d%%
+推荐:%s大%.1f
+id:%s`, f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
 	if f.HalfState == STATUS_SECONDHALF && f.Size-rescore > 0.1 { // 当前盘比目标盘大
 		f.WaitOdd = true
 		s += fmt.Sprintf("\n/闪电注意：当前盘口(%.2f)高于推荐盘口,可等水", f.Size)
@@ -293,7 +311,11 @@ func (f *Filter) MakeRuleMessage() string {
 }
 
 func (f *Filter) MakeNoticeOdd() string {
-	return fmt.Sprintf("/开车[%s]\n%s\n%s\n降盘啦，快上车\nid:%s", f.Rule, f.LeagueName, f.TeamName, f.It)
+	return fmt.Sprintf(`/开车[%s]
+%s
+%s
+降盘啦，快上车
+id:%s`, f.Rule, f.LeagueName, f.TeamName, f.It)
 }
 
 func (f *Filter) Insert() {
@@ -471,7 +493,16 @@ func (m *Match) Insert() {
 }
 
 func (m *Match) Preview() string {
-	return fmt.Sprintf("%s \n%s  \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n上半场: \n\t胜平负:%.2f,%.2f,%.2f \n\t让分:%.2f,%.2f,%.2f \n\t大小盘:%.2f,%.2f,%.2f\n\tid:%s",
+	return fmt.Sprintf(`%s 
+%s  
+	胜平负:%.2f,%.2f,%.2f 
+	让分:%.2f,%.2f,%.2f 
+	大小盘:%.2f,%.2f,%.2f
+  上半场:
+	胜平负:%.2f,%.2f,%.2f 
+	让分:%.2f,%.2f,%.2f
+	大小盘:%.2f,%.2f,%.2f
+id:%s`,
 		m.LeagueName, m.TeamName,
 		m.FirstAvgHm, m.FirstAvgEq, m.FirstAvgAw,
 		m.FirstLet, m.FirstLetHm, m.FirstLetAw,
@@ -484,7 +515,21 @@ func (m *Match) Preview() string {
 }
 
 func (m *Match) String() string {
-	return fmt.Sprintf("%s %s %d:%d 比分:%d-%d \n\t胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t初盘：胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f\n\t 上半场 胜平负:%.2f,%.2f,%.2f 让分:%.2f,%.2f,%.2f 大小盘:%.2f,%.2f,%.2f",
+	return fmt.Sprintf(`%s
+%s 
+时间:[%02d:%02d] 比分:%d-%d
+胜平负:%.2f,%.2f,%.2f
+让分:%.2f,%.2f,%.2f
+大小盘:%.2f,%.2f,%.2f
+初盘：
+ 全场:
+  胜平负:%.2f,%.2f,%.2f
+  让分:%.2f,%.2f,%.2f
+  大小盘:%.2f,%.2f,%.2f
+ 上半场:
+  胜平负:%.2f,%.2f,%.2f
+  让分:%.2f,%.2f,%.2f
+  大小盘:%.2f,%.2f,%.2f`,
 		m.LeagueName, m.TeamName,
 		m.Min, m.Sec,
 		m.HoScore, m.GuScore,
@@ -494,9 +539,9 @@ func (m *Match) String() string {
 		m.FirstAvgHm, m.FirstAvgEq, m.FirstAvgAw,
 		m.FirstLet, m.FirstLetHm, m.FirstLetAw,
 		m.FirstSize, m.FirstSizeBig, m.FirstSizeSma,
-		m.HalfAvgHm, m.HalfAvgEq, m.HalfAvgAw,
-		m.HalfLet, m.HalfLetHm, m.HalfLetAw,
-		m.HalfSize, m.HalfSizeBig, m.HalfSizeSma,
+		m.HalfFirstAvgHm, m.HalfFirstAvgEq, m.HalfFirstAvgAw,
+		m.HalfFirstLet, m.HalfFirstLetHm, m.HalfFirstLetAw,
+		m.HalfFirstSize, m.HalfFirstSizeBig, m.HalfFirstSizeSma,
 	)
 }
 
