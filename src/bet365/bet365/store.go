@@ -571,27 +571,21 @@ func (m *Match) Init(d *Bet365Data, node *Node) bool {
 				continue
 			}
 			oddnode := d.ChildByType(ma, "PA")
-			odds := make(map[int]*Node)
-			ors := make([]int, 0, 3)
-			for _, o := range oddnode {
-				or := o.Int("OR")
-				odds[or] = o
-				ors = append(ors, or)
-			}
-			sort.Ints(ors)
+			ns := NewSortNode("ID", oddnode)
+			sort.Sort(ns)
 			switch ot {
 			case HT_RESULT: // 胜平负
-				m.HalfFirstAvgHm = odds[ors[0]].Odd()
-				m.HalfFirstAvgAw = odds[ors[1]].Odd()
-				m.HalfFirstAvgEq = odds[ors[2]].Odd()
+				m.HalfFirstAvgHm = oddnode[0].Odd()
+				m.HalfFirstAvgEq = oddnode[1].Odd()
+				m.HalfFirstAvgAw = oddnode[2].Odd()
 			case HT_HANDICAP: // 让球
-				m.HalfFirstLet = odds[ors[0]].Float("HA")
-				m.HalfFirstLetHm = odds[ors[0]].Odd()
-				m.HalfFirstLetAw = odds[ors[1]].Odd()
+				m.HalfFirstLet = oddnode[0].Float("HA")
+				m.HalfFirstLetHm = oddnode[0].Odd()
+				m.HalfFirstLetAw = oddnode[1].Odd()
 			case HT_GOALS:
-				m.HalfFirstSize = odds[ors[0]].Float("HA")
-				m.HalfFirstSizeBig = odds[ors[0]].Odd()
-				m.HalfFirstSizeSma = odds[ors[1]].Odd()
+				m.HalfFirstSize = oddnode[0].Float("HA")
+				m.HalfFirstSizeBig = oddnode[0].Odd()
+				m.HalfFirstSizeSma = oddnode[1].Odd()
 			}
 		}
 	}
@@ -605,27 +599,21 @@ func (m *Match) Init(d *Bet365Data, node *Node) bool {
 		}
 		noodds = false
 		oddnode := d.ChildByType(ma, "PA")
-		odds := make(map[int]*Node)
-		ors := make([]int, 0, 3)
-		for _, o := range oddnode {
-			or := o.Int("OR")
-			odds[or] = o
-			ors = append(ors, or)
-		}
-		sort.Ints(ors)
+		ns := NewSortNode("ID", oddnode)
+		sort.Sort(ns)
 		switch ot {
 		case FT_RESULT: // 胜平负
-			m.FirstAvgHm = odds[ors[0]].Odd()
-			m.FirstAvgAw = odds[ors[1]].Odd()
-			m.FirstAvgEq = odds[ors[2]].Odd()
+			m.FirstAvgHm = oddnode[0].Odd()
+			m.FirstAvgEq = oddnode[1].Odd()
+			m.FirstAvgAw = oddnode[2].Odd()
 		case FT_HANDICAP: // 让球
-			m.FirstLet = odds[ors[0]].Float("HA")
-			m.FirstLetHm = odds[ors[0]].Odd()
-			m.FirstLetAw = odds[ors[1]].Odd()
+			m.FirstLet = oddnode[0].Float("HA")
+			m.FirstLetHm = oddnode[0].Odd()
+			m.FirstLetAw = oddnode[1].Odd()
 		case FT_GOALS:
-			m.FirstSize = odds[ors[0]].Float("HA")
-			m.FirstSizeBig = odds[ors[0]].Odd()
-			m.FirstSizeSma = odds[ors[1]].Odd()
+			m.FirstSize = oddnode[0].Float("HA")
+			m.FirstSizeBig = oddnode[0].Odd()
+			m.FirstSizeSma = oddnode[1].Odd()
 		}
 	}
 
@@ -688,27 +676,21 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 				break
 			}
 			oddnode := d.ChildByType(ma, "PA")
-			odds := make(map[int]*Node)
-			ors := make([]int, 0, 3)
-			for _, o := range oddnode {
-				or := o.Int("OR")
-				odds[or] = o
-				ors = append(ors, or)
-			}
-			sort.Ints(ors)
+			ns := NewSortNode("ID", oddnode)
+			sort.Sort(ns)
 			switch id {
 			case HT_RESULT: // 胜平负
-				m.HalfAvgHm = odds[ors[0]].Odd()
-				m.HalfAvgAw = odds[ors[1]].Odd()
-				m.HalfAvgEq = odds[ors[2]].Odd()
+				m.HalfAvgHm = oddnode[0].Odd()
+				m.HalfAvgEq = oddnode[1].Odd()
+				m.HalfAvgAw = oddnode[2].Odd()
 			case HT_HANDICAP: // 让球
-				m.HalfLet = odds[ors[0]].Float("HA")
-				m.HalfLetHm = odds[ors[0]].Odd()
-				m.HalfLetAw = odds[ors[1]].Odd()
+				m.HalfLet = oddnode[0].Float("HA")
+				m.HalfLetHm = oddnode[0].Odd()
+				m.HalfLetAw = oddnode[1].Odd()
 			case HT_GOALS:
-				m.HalfSize = odds[ors[0]].Float("HA")
-				m.HalfSizeBig = odds[ors[0]].Odd()
-				m.HalfSizeSma = odds[ors[1]].Odd()
+				m.HalfSize = oddnode[0].Float("HA")
+				m.HalfSizeBig = oddnode[0].Odd()
+				m.HalfSizeSma = oddnode[1].Odd()
 			}
 		}
 	}
@@ -720,27 +702,21 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 			return event
 		}
 		oddnode := d.ChildByType(ma, "PA")
-		odds := make(map[int]*Node)
-		ors := make([]int, 0, 3)
-		for _, o := range oddnode {
-			or := o.Int("OR")
-			odds[or] = o
-			ors = append(ors, or)
-		}
-		sort.Ints(ors)
+		ns := NewSortNode("ID", oddnode)
+		sort.Sort(ns)
 		switch id {
 		case FT_RESULT: // 胜平负
-			m.AvgHm = odds[ors[0]].Odd()
-			m.AvgAw = odds[ors[1]].Odd()
-			m.AvgEq = odds[ors[2]].Odd()
+			m.AvgHm = oddnode[0].Odd()
+			m.AvgEq = oddnode[1].Odd()
+			m.AvgAw = oddnode[2].Odd()
 		case FT_HANDICAP: // 让球
-			m.Let = odds[ors[0]].Float("HA")
-			m.LetHm = odds[ors[0]].Odd()
-			m.LetAw = odds[ors[1]].Odd()
+			m.Let = oddnode[0].Float("HA")
+			m.LetHm = oddnode[0].Odd()
+			m.LetAw = oddnode[1].Odd()
 		case FT_GOALS:
-			m.Size = odds[ors[0]].Float("HA")
-			m.SizeBig = odds[ors[0]].Odd()
-			m.SizeSma = odds[ors[1]].Odd()
+			m.Size = oddnode[0].Float("HA")
+			m.SizeBig = oddnode[0].Odd()
+			m.SizeSma = oddnode[1].Odd()
 		}
 	}
 

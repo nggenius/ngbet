@@ -121,6 +121,10 @@ func NewBet365() *Bet365 {
 	return b
 }
 
+func (b *Bet365) Dump() {
+	b.data.Dump()
+}
+
 func (b *Bet365) onMessage(data []byte) error {
 	xx := bytes.Split(data, []byte(_DELIMITERS_MESSAGE))
 	if xx[0][0] == '1' {
@@ -779,6 +783,11 @@ func AddSizeNotify(group, member string, it string, size, big string) string {
 
 func GetFirst(it string) string {
 	return bet.FirstInfo(it)
+}
+
+func DumpInfo() string {
+	bet.Dump()
+	return "dump success"
 }
 
 func Run(addr string, origin string, getcookieurl string) {

@@ -109,6 +109,8 @@ func do(values url.Values, cmd string, args []string) string {
 		}
 		config.Setting.Recommend = append(config.Setting.Recommend, g)
 		return "增加订阅成功，将收到比赛推荐信息"
+	case "dump":
+		return bet365.DumpInfo()
 	default:
 		return "[error]你说什么我听不懂,输入help或者帮助查看所有支持的命令"
 	}

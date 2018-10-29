@@ -2,12 +2,42 @@ package bet365
 
 import (
 	"bytes"
+	"container/list"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
+
+type NS struct {
+	n   []*Node
+	att string
+}
+
+func NewSortNode(att string, n []*Node) *NS {
+	ns := new(NS)
+	ns.n = n
+	ns.att = att
+	return ns
+}
+
+func (ns *NS) Len() int {
+	return len(ns.n)
+}
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (ns *NS) Less(i, j int) bool {
+	return ns.n[i].Attr(ns.att) < ns.n[j].Attr(ns.att)
+}
+
+// Swap swaps the elements with indexes i and j.
+func (ns *NS) Swap(i, j int) {
+	ns.n[i], ns.n[j] = ns.n[j], ns.n[i]
+}
 
 // MD=1 上半场结束
 // TS=1 下半场
@@ -50,8 +80,9 @@ func split(data []byte) map[string]string {
 }
 
 type Node struct {
-	tag    string
-	child  map[string]*Node
+	tag   string
+	child *list.List
+	//child  map[string]*Node
 	attrs  map[string]string
 	parent *Node
 }
@@ -166,11 +197,17 @@ func (n *Node) Odd() float64 {
 }
 
 func (n *Node) Remove(it string) {
-	delete(n.child, it)
+	for ele := n.child.Front(); ele != nil; ele = ele.Next() {
+		n := ele.Value.(*Node)
+		if n.It() == it {
+			n.child.Remove(ele)
+			return
+		}
+	}
 }
 
 func (n *Node) AddChild(node *Node) {
-	n.child[node.It()] = node
+	n.child.PushBack(node)
 }
 
 func (n *Node) Path() string {
@@ -184,11 +221,19 @@ func (n *Node) Path() string {
 	return p
 }
 
+func (n *Node) String() string {
+	var ret []string
+	for k, v := range n.attrs {
+		ret = append(ret, fmt.Sprintf("%s=%s", k, v))
+	}
+	return fmt.Sprintf("%s;%s", n.tag, strings.Join(ret, ";"))
+}
+
 func NewNode(t string) *Node {
 	n := new(Node)
 	n.tag = t
 	n.attrs = make(map[string]string)
-	n.child = make(map[string]*Node)
+	n.child = list.New()
 	return n
 }
 
@@ -196,7 +241,7 @@ func NewSimpleNode(t string) *Node {
 	n := new(Node)
 	n.tag = t
 	n.attrs = make(map[string]string)
-	n.child = make(map[string]*Node)
+	n.child = list.New()
 	n.attrs["IT"] = t
 	return n
 }
@@ -219,6 +264,20 @@ func NewBet365Data(name string) *Bet365Data {
 	d.Root = NewSimpleNode(name)
 	d.del = make([]string, 0, 32)
 	return d
+}
+
+func (d *Bet365Data) Dump() {
+	str := make([]string, 0, 1024)
+	dump(&str, d.Root)
+	out := strings.Join(str, "\n")
+	ioutil.WriteFile("dump.txt", []byte(out), 0x766)
+}
+
+func dump(str *[]string, node *Node) {
+	*str = append(*str, node.String())
+	for e := node.child.Front(); e != nil; e = e.Next() {
+		dump(str, e.Value.(*Node))
+	}
 }
 
 func formatTime(s string) time.Time {
@@ -293,12 +352,13 @@ func (d *Bet365Data) FindNode(it string) *Node {
 
 func (d *Bet365Data) ChildByType(node *Node, t string) []*Node {
 	var ret []*Node
-	for _, c := range node.child {
+	for e := node.child.Front(); e != nil; e = e.Next() {
+		c := e.Value.(*Node)
 		if c != nil && c.tag == t {
 			ret = append(ret, c)
 		}
 
-		if len(c.child) > 0 {
+		if c.child.Len() > 0 {
 			r1 := d.ChildByType(c, t)
 			if len(r1) > 0 {
 				ret = append(ret, r1...)
@@ -321,10 +381,11 @@ func (d *Bet365Data) AddNode(parent *Node, node *Node) *Node {
 }
 
 func (d *Bet365Data) RemoveAllChild(node *Node) {
-	for k, v := range node.child { // 循环遍历所有子结点
-		if v != nil {
-			d.Remove(k)
-		}
+
+	for e := node.child.Front(); e != nil; { // 循环遍历所有子结点
+		cur := e
+		e = e.Next()
+		d.Remove(cur.Value.(*Node).It())
 	}
 }
 
