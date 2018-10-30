@@ -222,7 +222,7 @@ func (f *Filter) CheckActive(m *Match) {
 				chat.SendToRecommend(msg)
 			}
 		case RULE_LZ_001:
-			if m.Min >= 70 {
+			if m.Min >= 70 && m.Min <= 85 {
 				sub := math.Abs(m.AvgHm - m.AvgAw)
 				if sub < 0.001 || (sub > 0.99 && sub < 1.001) {
 					f.Inactive = false
