@@ -571,6 +571,9 @@ func (m *Match) Init(d *Bet365Data, node *Node) bool {
 				continue
 			}
 			oddnode := d.ChildByType(ma, "PA")
+			if len(oddnode) == 0 {
+				break
+			}
 			ns := NewSortNode("ID", oddnode)
 			sort.Sort(ns)
 			switch ot {
@@ -599,6 +602,9 @@ func (m *Match) Init(d *Bet365Data, node *Node) bool {
 		}
 		noodds = false
 		oddnode := d.ChildByType(ma, "PA")
+		if len(oddnode) == 0 {
+			break
+		}
 		ns := NewSortNode("ID", oddnode)
 		sort.Sort(ns)
 		switch ot {
@@ -676,6 +682,9 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 				break
 			}
 			oddnode := d.ChildByType(ma, "PA")
+			if len(oddnode) == 0 {
+				break
+			}
 			ns := NewSortNode("ID", oddnode)
 			sort.Sort(ns)
 			switch id {
@@ -702,6 +711,9 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 			return event
 		}
 		oddnode := d.ChildByType(ma, "PA")
+		if len(oddnode) == 0 {
+			break
+		}
 		ns := NewSortNode("ID", oddnode)
 		sort.Sort(ns)
 		switch id {
