@@ -47,7 +47,14 @@ func parseCommand(content string) (cmd string, args []string) {
 func do(values url.Values, cmd string, args []string) string {
 	switch cmd {
 	case "help", "帮助":
-		return "[所有命令]:\n  [odd|赔率]:返回欧亚转换，odd 1.5\n  [ssq|双色球]:双色球五注\n  [time|定时]:比赛定时提醒，time id 35\n  [size|大球]:大小球提醒，size id 0.5 2.0\n  [first|初盘]:初盘赔率，first id"
+		return `[所有命令]:
+  [odd|赔率]:返回欧亚转换，odd 1.5
+  [ssq|双色球]:双色球五注
+  [time|定时]:比赛定时提醒，time id 35
+  [size|大球]:大小球提醒，size id 0.5 2.0
+  [first|初盘]:初盘赔率，first id
+  [add]:关注球队, add team
+  [remove]:移除球队, remove team`
 	case "odd", "赔率":
 		if len(args) != 1 {
 			return "[error] 参数错误"
