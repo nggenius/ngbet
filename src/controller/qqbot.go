@@ -109,6 +109,16 @@ func do(values url.Values, cmd string, args []string) string {
 		}
 		config.Setting.Recommend = append(config.Setting.Recommend, g)
 		return "增加订阅成功，将收到比赛推荐信息"
+	case "add":
+		if len(args) == 0 {
+			return "[error] 参数错误， example:add teamname"
+		}
+		return bet365.AddAttention(strings.Join(args, " "))
+	case "remove":
+		if len(args) == 0 {
+			return "[error] 参数错误， example:remove teamname"
+		}
+		return bet365.RemoveAttention(strings.Join(args, " "))
 	case "dump":
 		return bet365.DumpInfo()
 	default:

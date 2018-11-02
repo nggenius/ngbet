@@ -458,6 +458,18 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 			log.Println(msg)
 			chat.SendToBroadcast(msg)
 		}
+		if m.State == STATUS_FIRSTHALF {
+			tn := strings.Split(m.TeamName, " v ")
+			if len(tn) != 2 {
+				break
+			}
+			a := new(Attention)
+			if a.Find(tn[0]) || a.Find(tn[1]) {
+				msg := fmt.Sprintf(`/闹钟 关注的比赛开始了\n%s\n%s`, m.LeagueName, m.TeamName)
+				chat.SendToRecommend(msg)
+			}
+		}
+
 	case EVENT_GOAL:
 		b.CheckRed(m)
 		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%\nid:%s", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall(), m.It)
@@ -790,6 +802,27 @@ func DumpInfo() string {
 	return "dump success"
 }
 
+func AddAttention(team string) string {
+	a := new(Attention)
+	if a.Find(team) {
+		return "[error] 当前队伍已经添加过"
+	}
+
+	a.Team = team
+	a.Insert()
+	return fmt.Sprintf("%s 已经添加进关注库", team)
+}
+
+func RemoveAttention(team string) string {
+	a := new(Attention)
+	if a.Find(team) {
+		a.Remove()
+		return fmt.Sprintf("%s 已经从关注库移除", team)
+	}
+
+	return fmt.Sprintf("[error]%s 没有找到，或者已经删除", team)
+}
+
 func Run(addr string, origin string, getcookieurl string) {
 	var err error
 	engine, err = xorm.NewEngine("sqlite3", "./bet365.db")
@@ -797,7 +830,7 @@ func Run(addr string, origin string, getcookieurl string) {
 		panic(err)
 	}
 
-	engine.Sync2(new(Match), new(Filter), new(SnapShot))
+	engine.Sync2(new(Match), new(Filter), new(SnapShot), new(Attention))
 
 	engine.DatabaseTZ = time.Local
 	engine.TZLocation = time.Local

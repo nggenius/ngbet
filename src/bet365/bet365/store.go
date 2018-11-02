@@ -734,3 +734,27 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 
 	return event
 }
+
+type Attention struct {
+	Id   int64
+	Team string `xorm:"index"`
+}
+
+func (a *Attention) Insert() {
+	_, err := engine.Insert(a)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (a *Attention) Remove() {
+	engine.Where("team=?", a.Team).Delete(a)
+}
+
+func (a *Attention) Find(team string) bool {
+	b, err := engine.Where("team=?", team).Get(a)
+	if err != nil {
+		return false
+	}
+	return b
+}
