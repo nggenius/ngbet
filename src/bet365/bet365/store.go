@@ -196,7 +196,7 @@ type Filter struct {
 	WaitOdd          bool
 	Inactive         bool  // 未激活
 	Created          int64 `xorm:"created"`
-	extra            int
+	extra            int   `xorm:"-"`
 }
 
 func (f *Filter) CheckActive(m *Match) {
