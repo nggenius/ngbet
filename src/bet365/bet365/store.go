@@ -196,6 +196,7 @@ type Filter struct {
 	WaitOdd          bool
 	Inactive         bool  // 未激活
 	Created          int64 `xorm:"created"`
+	extra            int
 }
 
 func (f *Filter) CheckActive(m *Match) {
@@ -225,13 +226,17 @@ func (f *Filter) CheckActive(m *Match) {
 			if m.Min >= 70 && m.Min <= 85 {
 				sub := math.Abs(m.AvgHm - m.AvgAw)
 				if sub < 0.001 || (sub > 0.99 && sub < 1.001) {
-					f.Inactive = false
-					f.HoScore = m.HoScore
-					f.GuScore = m.GuScore
-					f.Update("inactive", "ho_score", "gu_score")
-					msg := f.MakeRuleMessage()
-					log.Println(msg)
-					chat.SendToRecommend(msg)
+					if f.extra == 1 {
+						f.Inactive = false
+						f.HoScore = m.HoScore
+						f.GuScore = m.GuScore
+						f.Update("inactive", "ho_score", "gu_score")
+						msg := f.MakeRuleMessage()
+						log.Println(msg)
+						chat.SendToRecommend(msg)
+						return
+					}
+					f.extra = 1
 				}
 
 			}
