@@ -465,7 +465,7 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 			}
 			a := new(Attention)
 			if a.Find(tn[0]) || a.Find(tn[1]) {
-				msg := fmt.Sprintf(`/闪电 关注的球队比赛开始了\n%s\n%s`, m.LeagueName, m.TeamName)
+				msg := fmt.Sprintf(`/闪电 关注的球队比赛开始了\n%s\n%s\n%s`, m.LeagueName, m.TeamName, m.It)
 				chat.SendToRecommend(msg)
 			}
 		}
