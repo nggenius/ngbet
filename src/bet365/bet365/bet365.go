@@ -59,7 +59,14 @@ var (
 	HT_GOALS    = 10171 // 半场大小球
 	HT_ODDS     = []int{HT_RESULT, HT_HANDICAP, HT_GOALS}
 
-	RULES  = []string{RULE_334, RULE_7091, RULE_757, RULE_HALF_05, RULE_HALF_EQ, RULE_LZ_001}
+	RULES = []string{
+		RULE_334,
+		RULE_7091,
+		RULE_757,
+		RULE_HALF_05,
+		//RULE_HALF_EQ,
+		//RULE_LZ_001,
+	}
 	engine *xorm.Engine
 )
 
