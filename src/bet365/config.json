@@ -17,8 +17,8 @@
             "half0.5"
         ],
         "state": {
-            "firsthalf": ["halfeq"],
-            "middle":["lz001"],
+            "firsthalf": [],
+            "middle":[],
             "secondhalf":[]
         }
     }
