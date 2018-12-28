@@ -89,6 +89,7 @@ func SendDingTalk(msg, webhook string) {
 		}
 
 		resp.Body.Close()
+		break
 	}
 
 }
