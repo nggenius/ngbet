@@ -4,10 +4,10 @@
         "host": "https://www.348365365.com"
     },
     "recommend": [
-        "有球必应"
+        "https://oapi.dingtalk.com/robot/send?access_token=c858baba94d4b7183840aaa6321fddf73e44c029139813303aff6ac347f6ec7d"
     ],
     "broadcast": [
-        "有球必应"
+        "https://oapi.dingtalk.com/robot/send?access_token=c858baba94d4b7183840aaa6321fddf73e44c029139813303aff6ac347f6ec7d"
     ],
     "rule": {
         "update": [

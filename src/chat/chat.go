@@ -1,8 +1,11 @@
 package chat
 
 import (
+	"bytes"
 	"config"
-	"os/exec"
+	"encoding/json"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/songtianyi/rrframework/logs"
@@ -13,6 +16,10 @@ type msginfo struct {
 	msg   string
 	group string
 }
+
+const (
+	FREQUENCE = time.Second * 5
+)
 
 var (
 	session  *wxweb.Session
@@ -40,13 +47,58 @@ func SendQQMessage(msg string, group string) {
 	}
 }
 
+type Content struct {
+	Content string `json:"content"`
+}
+
+type At struct {
+	AtMobiles []string `json:"atMobiles"`
+	IsAtAll   bool     `json:"isAtAll"`
+}
+
+type DingTalkMsg struct {
+	MsgType string  `json:"msgtype"`
+	Text    Content `json:"text"`
+	At      At      `json:"at"`
+}
+
+func makeDingTalkMsg(msg string) []byte {
+	dmsg := DingTalkMsg{}
+	dmsg.MsgType = "text"
+	dmsg.Text.Content = msg
+	dmsg.At.IsAtAll = false
+	data, err := json.Marshal(dmsg)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func SendDingTalk(msg, webhook string) {
+	data := makeDingTalkMsg(msg)
+	if data == nil {
+		return
+	}
+
+	for {
+		resp, err := http.Post(webhook, "application/json", bytes.NewReader(data))
+		if err != nil {
+			time.Sleep(time.Second)
+			log.Println(err)
+			continue
+		}
+
+		resp.Body.Close()
+	}
+
+}
+
 func MessageLoop() {
 	for {
 		select {
 		case m := <-msgqueue:
-			cmd := exec.Command("qq", "send", "group", m.group, m.msg)
-			cmd.Run()
-			time.Sleep(time.Millisecond * 10)
+			SendDingTalk(m.msg, m.group)
+			time.Sleep(FREQUENCE)
 		}
 	}
 }
