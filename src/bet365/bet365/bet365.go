@@ -461,7 +461,7 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 	case EVENT_CHANGE_STATE:
 		b.CheckBlack(m)
 		if m.State != STATUS_UNKNOWN {
-			msg := fmt.Sprintf("[%s] %s %s %d-%d 平局概率:%d%%\nid:%s", State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall(), m.It)
+			msg := fmt.Sprintf(STATE_INFO, State(m.State), m.LeagueName, m.TeamName, m.HoScore, m.GuScore, m.Dogfall(), m.It)
 			log.Println(msg)
 			chat.SendToBroadcast(msg)
 		}
@@ -472,19 +472,19 @@ func (b *Bet365) CheckFilter(e int, m *Match) {
 			}
 			a := new(Attention)
 			if a.Find(tn[0]) || a.Find(tn[1]) {
-				msg := fmt.Sprintf(`/闪电 关注的球队比赛开始了\n%s\n%s\n%s`, m.LeagueName, m.TeamName, m.It)
+				msg := fmt.Sprintf(ATTENTION, m.LeagueName, m.TeamName, m.It)
 				chat.SendToRecommend(msg)
 			}
 		}
 
 	case EVENT_GOAL:
 		b.CheckRed(m)
-		msg := fmt.Sprintf("[进球] %s %s %d:%d %d-%d 平局概率:%d%%\nid:%s", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall(), m.It)
+		msg := fmt.Sprintf(GLOAL, m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.Dogfall(), m.It)
 		log.Println(msg)
 		chat.SendToBroadcast(msg)
 	case EVENT_CANCEL_GOAL:
 		b.ResetRed(m)
-		msg := fmt.Sprintf("[无效] %s %s %d:%d %d-%d \nid:%s", m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.It)
+		msg := fmt.Sprintf(INVALID, m.LeagueName, m.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore, m.It)
 		log.Println(msg)
 		chat.SendToBroadcast(msg)
 	}
@@ -626,7 +626,7 @@ func (b *Bet365) rulehalfeq(m *Match) {
 			f.CopyFromMatch(m)
 			f.Insert()
 			b.filter[m.It][f.Rule] = f
-			msg := fmt.Sprintf("/闪电注意 \n%s \n%s \n 经评估，上半场破蛋概率较大，请关注。\nid:%s", m.LeagueName, m.TeamName, m.It)
+			msg := fmt.Sprintf(ATTENTION_EQ, m.LeagueName, m.TeamName, m.It)
 			log.Println(msg)
 			chat.SendToRecommend(msg)
 		}
@@ -842,7 +842,7 @@ func Run(addr string, origin string, getcookieurl string) {
 	engine.DatabaseTZ = time.Local
 	engine.TZLocation = time.Local
 
-	chat.SendToRecommend("初始化⚽[流泪][红包][炸弹][忍者]")
+	chat.SendToRecommend("初始化⚽[尴尬][红包][炸弹][忍者]")
 	bet = NewBet365()
 	delay := time.Second * 3
 	retrys := 0

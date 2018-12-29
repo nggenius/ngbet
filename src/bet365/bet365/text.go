@@ -1,7 +1,7 @@
 package bet365
 
 const (
-	TEXT_INVALID = `[流泪] [%s] 
+	TEXT_INVALID = `[尴尬] [%s] 
 %s
 %s
 [%02d:%02d] 进球无效，比分:%d-%d`
@@ -63,4 +63,27 @@ id:%s`
   胜平负:%.2f,%.2f,%.2f
   让分:%.2f,%.2f,%.2f
   大小盘:%.2f,%.2f,%.2f`
+
+	ATTENTION = `[忍者] 关注的球队比赛开始了
+%s
+%s
+%s`
+
+	STATE_INFO = `[%s] %s %s %d-%d 
+平局概率:%d%%
+id:%s
+	`
+
+	GLOAL = `[进球] %s %s %d:%d %d-%d 
+平局概率:%d%%
+id:%s`
+
+	INVALID = `[无效] %s %s %d:%d %d-%d 
+id:%s`
+
+	ATTENTION_EQ = `[忍者]注意 
+%s 
+%s 
+经评估，上半场破蛋概率较大，请关注。
+id:%s`
 )
