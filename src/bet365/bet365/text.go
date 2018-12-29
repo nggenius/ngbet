@@ -1,27 +1,27 @@
 package bet365
 
 const (
-	TEXT_INVALID = `/流泪 [%s] 
+	TEXT_INVALID = `[流泪] [%s] 
 %s
 %s
 [%02d:%02d] 进球无效，比分:%d-%d`
 
-	TEXT_RED = `/红包 [红] [%s] 
+	TEXT_RED = `[红包] [红] [%s] 
 %s
 %s
-[%02d:%02d] /足球 比分:%d-%d`
+[%02d:%02d] ⚽ 比分:%d-%d`
 
-	TEXT_BLACK_HALF = `/炸弹 [黑] [%s] 
+	TEXT_BLACK_HALF = `[炸弹] [黑] [%s] 
 %s
 %s
 上半场结束，比分:%d-%d`
 
-	TEXT_BLACK = `/炸弹 [黑] [%s] 
+	TEXT_BLACK = `[炸弹] [黑] [%s] 
 %s
 %s  
 比赛结束，比分:%d-%d`
 
-	TEXT_RULE_MSG = `/足球[%s] 
+	TEXT_RULE_MSG = `⚽[%s] 
 %s
 %s
 当前比分:%d-%d
@@ -29,9 +29,9 @@ const (
 推荐:%s大%.1f
 id:%s`
 
-	TEXT_ABOVE = "\n/闪电注意：当前盘口(%.2f)高于推荐盘口,可等水"
+	TEXT_ABOVE = "\n[忍者]注意：当前盘口(%.2f)高于推荐盘口,可等水"
 
-	TEXT_NOTICE_ODD_MSG = `/开车[%s]
+	TEXT_NOTICE_ODD_MSG = `[忍者][%s]
 %s
 %s
 降盘啦，快上车
