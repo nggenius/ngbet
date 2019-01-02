@@ -289,21 +289,21 @@ func (b *Bet365) CheckNotify(m *Match) {
 			case WAIT_TIME:
 				if m.Min >= n.WaitTime {
 					msg := fmt.Sprintf("@%s\n%s\n%s\n当前时间[%d:%d]", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec)
-					chat.SendQQMessage(msg, n.Group)
+					chat.SendMessage(msg, n.Group)
 					l.Remove(e)
 				}
 			case WAIT_HALF_SIZE:
 				if m.State == STATUS_FIRSTHALF && m.HalfSize <= n.WaitSize+0.01 &&
 					m.HalfSizeBig >= n.WaitBig {
 					msg := fmt.Sprintf("@%s\n%s\n%s\n上半场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.HalfSize, m.HalfSizeBig)
-					chat.SendQQMessage(msg, n.Group)
+					chat.SendMessage(msg, n.Group)
 					l.Remove(e)
 				}
 			case WAIT_FULL_SIZE:
 				if m.State == STATUS_SECONDHALF && m.Size <= n.WaitSize+0.01 &&
 					m.SizeBig >= n.WaitBig {
 					msg := fmt.Sprintf("@%s\n%s\n%s\n全场[%d:%d]\n大小盘:%.2f, %.2f", n.Member, m.LeagueName, m.TeamName, m.Min, m.Sec, m.Size, m.SizeBig)
-					chat.SendQQMessage(msg, n.Group)
+					chat.SendMessage(msg, n.Group)
 					l.Remove(e)
 				}
 			}
