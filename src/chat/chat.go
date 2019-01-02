@@ -23,7 +23,7 @@ const (
 
 var (
 	session  *wxweb.Session
-	msgqueue = make(chan *msginfo, 128)
+	msgqueue = make(map[string]chan *msginfo, 10)
 )
 
 func SendToRecommend(msg string) {
@@ -42,7 +42,7 @@ func SendToBroadcast(msg string) {
 func SendQQMessage(msg string, group string) {
 	m := &msginfo{msg, group}
 	select {
-	case msgqueue <- m:
+	case msgqueue[group] <- m:
 	default:
 	}
 }
@@ -95,9 +95,26 @@ func SendDingTalk(msg, webhook string) {
 }
 
 func MessageLoop() {
+	for _, g := range config.Setting.Broadcast {
+		if _, ok := msgqueue[g]; ok {
+			continue
+		}
+		msgqueue[g] = make(chan *msginfo, 128)
+		go loop(msgqueue[g])
+	}
+	for _, g := range config.Setting.Recommend {
+		if _, ok := msgqueue[g]; ok {
+			continue
+		}
+		msgqueue[g] = make(chan *msginfo, 128)
+		go loop(msgqueue[g])
+	}
+}
+
+func loop(ch chan *msginfo) {
 	for {
 		select {
-		case m := <-msgqueue:
+		case m := <-ch:
 			SendDingTalk(m.msg, m.group)
 			time.Sleep(FREQUENCE)
 		}

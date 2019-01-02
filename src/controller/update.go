@@ -1,6 +1,10 @@
 package controller
 
-import "github.com/lunny/tango"
+import (
+	"ssq"
+
+	"github.com/lunny/tango"
+)
 
 type Update struct {
 	RenderBase
@@ -9,7 +13,7 @@ type Update struct {
 
 func (u *Update) Get() interface{} {
 	u.Ctx.Header().Add("Access-Control-Allow-Origin", "*") //允许访问所有域
-	lh := histroy(true)
+	lh := ssq.Histroy(true)
 	return map[string]interface{}{
 		"Status": 200,
 		"Last":   lh[0],

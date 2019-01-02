@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"ssq"
 	"strings"
 )
 
@@ -62,7 +63,7 @@ func do(values url.Values, cmd string, args []string) string {
 		odds := odd.GetOddStr(args[0])
 		return strings.Join(odds, "\n")
 	case "ssq", "双色球":
-		balls := Millionaire()
+		balls := ssq.Millionaire()
 		str := fmt.Sprintf("上期%d:\n %02d %02d %02d %02d %02d %02d | %02d\n", balls.Last.Expect,
 			balls.Last.Red[0],
 			balls.Last.Red[1],
@@ -87,7 +88,7 @@ func do(values url.Values, cmd string, args []string) string {
 		config.LoadConfig()
 		return "reload ok"
 	case "update":
-		lh := histroy(true)
+		lh := ssq.Histroy(true)
 		return fmt.Sprintf("update ok, %v", lh[0])
 	case "time", "定时":
 		if len(args) != 2 {
