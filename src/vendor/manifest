@@ -209,6 +209,14 @@
 			"revision": "ca9a01fc2f9505024045632c50e5e8cd6142fafe",
 			"branch": "master",
 			"notests": true
+		},
+		{
+			"importpath": "github.com/robfig/cron",
+			"repository": "https://github.com/robfig/cron",
+			"vcs": "git",
+			"revision": "",
+			"branch": "master",
+			"notests": true
 		}
 	]
 }
