@@ -157,66 +157,6 @@
 			"revision": "10b5d1a1d3b0f0f5e6a6fd8d9938607e75f107c1",
 			"branch": "master",
 			"notests": true
-		},
-		{
-			"importpath": "github.com/songtianyi/laosj/spider",
-			"repository": "https://github.com/songtianyi/laosj",
-			"vcs": "git",
-			"revision": "760f7844583a7499944a9b8b3de73d5c48a15814",
-			"branch": "master",
-			"path": "/spider",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/songtianyi/rrframework/config",
-			"repository": "https://github.com/songtianyi/rrframework",
-			"vcs": "git",
-			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
-			"branch": "master",
-			"path": "/config",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/songtianyi/rrframework/logs",
-			"repository": "https://github.com/songtianyi/rrframework",
-			"vcs": "git",
-			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
-			"branch": "master",
-			"path": "/logs",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/songtianyi/rrframework/storage",
-			"repository": "https://github.com/songtianyi/rrframework",
-			"vcs": "git",
-			"revision": "4caefe307b3f27573889b4681ce21ccfd77d54c9",
-			"branch": "master",
-			"path": "/storage",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/songtianyi/wechat-go",
-			"repository": "https://github.com/songtianyi/wechat-go",
-			"vcs": "git",
-			"revision": "6714afaad18974e59becec1c0253f1989000568a",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "rsc.io/qr",
-			"repository": "https://github.com/rsc/qr",
-			"vcs": "git",
-			"revision": "ca9a01fc2f9505024045632c50e5e8cd6142fafe",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/robfig/cron",
-			"repository": "https://github.com/robfig/cron",
-			"vcs": "git",
-			"revision": "",
-			"branch": "master",
-			"notests": true
 		}
 	]
 }
