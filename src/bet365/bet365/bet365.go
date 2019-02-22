@@ -76,6 +76,15 @@ var (
 		//RULE_HALF_EQ,
 		//RULE_LZ_001,
 	}
+
+	RULEALIAS = []string{
+		RULE_334_ALIAS,
+		RULE_7091_ALIAS,
+		RULE_757_ALIAS,
+		RULE_HALF_05_ALIAS,
+		//RULE_HALF_EQ_ALIAS,
+		//RULE_LZ_001_ALIAS,
+	}
 	engine *xorm.Engine
 )
 
@@ -755,35 +764,35 @@ func Stat() string {
 	lzero, _ := time.ParseInLocation("2006-01-02", last.Format("2006-01-02"), time.Local)
 	l24, _ := time.ParseInLocation("2006-01-02", n.Format("2006-01-02"), time.Local)
 	result = append(result, "今日:")
-	for _, v := range RULES {
+	for k, v := range RULES {
 		var f Filter
 		total, err := engine.Where("rule=? and created > ? and Inactive=0", v, l24.Unix()).Count(&f)
 		if err != nil {
 			continue
 		}
 		red, err := engine.Where("rule=? and filter_state=? and created > ? and Inactive=0", v, FILTER_STATE_RED, l24.Unix()).Count(&f)
-		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
+		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", RULEALIAS[k], total, red, float64(red)/float64(total)*100))
 	}
 	result = append(result, "昨日:")
-	for _, v := range RULES {
+	for k, v := range RULES {
 		var f Filter
 		total, err := engine.Where("rule=? and created > ? and created < ? and Inactive=0", v, lzero.Unix(), l24.Unix()).Count(&f)
 		if err != nil {
 			continue
 		}
 		red, err := engine.Where("rule=? and filter_state=? and created > ? and created < ? and Inactive=0", v, FILTER_STATE_RED, lzero.Unix(), l24.Unix()).Count(&f)
-		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
+		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", RULEALIAS[k], total, red, float64(red)/float64(total)*100))
 	}
 
 	result = append(result, "总评:")
-	for _, v := range RULES {
+	for k, v := range RULES {
 		var f Filter
 		total, err := engine.Where("rule=? and Inactive=0", v).Count(&f)
 		if err != nil {
 			continue
 		}
 		red, err := engine.Where("rule=? and filter_state=? and Inactive=0", v, FILTER_STATE_RED).Count(&f)
-		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", v, total, red, float64(red)/float64(total)*100))
+		result = append(result, fmt.Sprintf("[%s] 总:%d 红:%d 命中率：%.1f", RULEALIAS[k], total, red, float64(red)/float64(total)*100))
 	}
 
 	return strings.Join(result, "\n")
