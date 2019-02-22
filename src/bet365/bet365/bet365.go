@@ -43,6 +43,15 @@ const (
 )
 
 const (
+	RULE_334_ALIAS     = "F4"
+	RULE_7091_ALIAS    = "S+1"
+	RULE_757_ALIAS     = "S7"
+	RULE_HALF_05_ALIAS = "F0.5"
+	RULE_HALF_EQ_ALIAS = "F0.5="
+	RULE_LZ_001_ALIAS  = "S="
+)
+
+const (
 	WAIT_TIME      = 1
 	WAIT_HALF_SIZE = 2 // 半场大小
 	WAIT_FULL_SIZE = 3 // 全场大小

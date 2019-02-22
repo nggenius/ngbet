@@ -199,6 +199,25 @@ type Filter struct {
 	extra            int   `xorm:"-"`
 }
 
+func (f *Filter) RuleAlias() string {
+	switch f.Rule {
+	case RULE_334:
+		return RULE_334_ALIAS
+	case RULE_7091:
+		return RULE_7091_ALIAS
+	case RULE_757:
+		return RULE_757_ALIAS
+	case RULE_HALF_05:
+		return RULE_HALF_05_ALIAS
+	case RULE_HALF_EQ:
+		return RULE_HALF_EQ_ALIAS
+	case RULE_LZ_001:
+		return RULE_LZ_001_ALIAS
+	default:
+		return "unknown"
+	}
+}
+
 func (f *Filter) CheckActive(m *Match) {
 	if f.Inactive {
 		switch f.Rule {
@@ -247,17 +266,17 @@ func (f *Filter) CheckActive(m *Match) {
 
 func (f *Filter) MakeResultMessage(reset bool, m *Match) string {
 	if reset {
-		return fmt.Sprintf(TEXT_INVALID, f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		return fmt.Sprintf(TEXT_INVALID, f.RuleAlias(), f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
 	}
 
 	if f.FilterState == FILTER_STATE_RED {
-		return fmt.Sprintf(TEXT_RED, f.Rule, f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
+		return fmt.Sprintf(TEXT_RED, f.RuleAlias(), f.LeagueName, f.TeamName, m.Min, m.Sec, m.HoScore, m.GuScore)
 	}
 	if f.FilterState == FILTER_STATE_BLACK {
 		if f.HalfState == STATUS_FIRSTHALF {
-			return fmt.Sprintf(TEXT_BLACK_HALF, f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
+			return fmt.Sprintf(TEXT_BLACK_HALF, f.RuleAlias(), f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
 		}
-		return fmt.Sprintf(TEXT_BLACK, f.Rule, f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
+		return fmt.Sprintf(TEXT_BLACK, f.RuleAlias(), f.LeagueName, f.TeamName, m.HoScore, m.GuScore)
 	}
 	return ""
 }
@@ -290,7 +309,7 @@ func (f *Filter) MakeRuleMessage() string {
 		half = "全场"
 	}
 	s := fmt.Sprintf(TEXT_RULE_MSG,
-		f.Rule, f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
+		f.RuleAlias(), f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
 	if f.HalfState == STATUS_SECONDHALF && f.Size-rescore > 0.1 { // 当前盘比目标盘大
 		f.WaitOdd = true
 		s += fmt.Sprintf(TEXT_ABOVE, f.Size)
@@ -299,7 +318,7 @@ func (f *Filter) MakeRuleMessage() string {
 }
 
 func (f *Filter) MakeNoticeOdd() string {
-	return fmt.Sprintf(TEXT_NOTICE_ODD_MSG, f.Rule, f.LeagueName, f.TeamName, f.It)
+	return fmt.Sprintf(TEXT_NOTICE_ODD_MSG, f.RuleAlias(), f.LeagueName, f.TeamName, f.It)
 }
 
 func (f *Filter) Insert() {
