@@ -391,11 +391,14 @@ func (b *Bet365) process() {
 	if len(dels) > 0 {
 		for _, it := range dels {
 			if match, ok := b.matchs[it]; ok {
+				if match.State != STATUS_COMPLETE {
+					match.State = STATUS_COMPLETE
+				}
+				// 删除前再检查一下状态
+				b.CheckBlack(match)
 				delete(b.matchs, it)
 				delete(b.filter, it)
-				if match.State == STATUS_COMPLETE {
-					delete(b.notify, it)
-				}
+				delete(b.notify, it)
 				msg := fmt.Sprintf("[删除] %s %s %d-%d %s", match.LeagueName, match.TeamName, match.HoScore, match.GuScore, State(match.State))
 				log.Println(msg)
 				//chat.SendQQMessage(msg, "天气预报")
