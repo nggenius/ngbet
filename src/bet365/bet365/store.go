@@ -558,14 +558,23 @@ func (m *Match) Init(d *Bet365Data, node *Node) bool {
 			sort.Sort(ns)
 			switch ot {
 			case HT_RESULT: // 胜平负
+				if len(oddnode) < 3 {
+					break
+				}
 				m.HalfFirstAvgHm = oddnode[0].Odd()
 				m.HalfFirstAvgEq = oddnode[1].Odd()
 				m.HalfFirstAvgAw = oddnode[2].Odd()
 			case HT_HANDICAP: // 让球
+				if len(oddnode) < 2 {
+					break
+				}
 				m.HalfFirstLet = oddnode[0].Float("HA")
 				m.HalfFirstLetHm = oddnode[0].Odd()
 				m.HalfFirstLetAw = oddnode[1].Odd()
 			case HT_GOALS:
+				if len(oddnode) < 2 {
+					break
+				}
 				m.HalfFirstSize = oddnode[0].Float("HA")
 				m.HalfFirstSizeBig = oddnode[0].Odd()
 				m.HalfFirstSizeSma = oddnode[1].Odd()
@@ -669,14 +678,23 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 			sort.Sort(ns)
 			switch id {
 			case HT_RESULT: // 胜平负
+				if len(oddnode) < 3 {
+					break
+				}
 				m.HalfAvgHm = oddnode[0].Odd()
 				m.HalfAvgEq = oddnode[1].Odd()
 				m.HalfAvgAw = oddnode[2].Odd()
 			case HT_HANDICAP: // 让球
+				if len(oddnode) < 2 {
+					break
+				}
 				m.HalfLet = oddnode[0].Float("HA")
 				m.HalfLetHm = oddnode[0].Odd()
 				m.HalfLetAw = oddnode[1].Odd()
 			case HT_GOALS:
+				if len(oddnode) < 2 {
+					break
+				}
 				m.HalfSize = oddnode[0].Float("HA")
 				m.HalfSizeBig = oddnode[0].Odd()
 				m.HalfSizeSma = oddnode[1].Odd()
@@ -698,14 +716,23 @@ func (m *Match) Update(d *Bet365Data, node *Node) []int {
 		sort.Sort(ns)
 		switch id {
 		case FT_RESULT: // 胜平负
+			if len(oddnode) < 3 {
+				break
+			}
 			m.AvgHm = oddnode[0].Odd()
 			m.AvgEq = oddnode[1].Odd()
 			m.AvgAw = oddnode[2].Odd()
 		case FT_HANDICAP: // 让球
+			if len(oddnode) < 2 {
+				break
+			}
 			m.Let = oddnode[0].Float("HA")
 			m.LetHm = oddnode[0].Odd()
 			m.LetAw = oddnode[1].Odd()
 		case FT_GOALS:
+			if len(oddnode) < 2 {
+				break
+			}
 			m.Size = oddnode[0].Float("HA")
 			m.SizeBig = oddnode[0].Odd()
 			m.SizeSma = oddnode[1].Odd()
