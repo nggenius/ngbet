@@ -53,8 +53,9 @@ func (b *bet365conn) Connect(addr string, origin string, getcookieurl string) er
 
 	r, err := grequests.Get(getcookieurl, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("get session failed: %s ", err.Error())
 	}
+
 	res := r.RawResponse.Cookies()
 	if len(res) == 0 {
 		return fmt.Errorf("get session failed")
@@ -83,7 +84,7 @@ func (b *bet365conn) Connect(addr string, origin string, getcookieurl string) er
 
 	c, resp, err := dialer.Dial(u.String(), header)
 	if err != nil {
-		return err
+		return fmt.Errorf("dial failed, %s ", err.Error())
 	}
 
 	if resp.StatusCode != http.StatusSwitchingProtocols {
@@ -94,7 +95,7 @@ func (b *bet365conn) Connect(addr string, origin string, getcookieurl string) er
 
 	err = b.sendMessage([]byte(genSessionId(session)))
 	if err != nil {
-		return err
+		return fmt.Errorf("send magic failed: %s", err.Error())
 	}
 
 	return nil

@@ -870,7 +870,7 @@ func Run(addr string, origin string, getcookieurl string) {
 	for {
 		err := bet.conn.Connect(addr, origin, getcookieurl)
 		if err != nil {
-			log.Printf("connect %s failed, err:%s", addr, err)
+			log.Printf("connect failed, addr: %s, err:%s", addr, err)
 			retrys++
 			if retrys > 3 {
 				delay = delay + time.Second
