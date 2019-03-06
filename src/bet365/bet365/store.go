@@ -292,6 +292,7 @@ func (f *Filter) MakeRuleMessage(m *Match) string {
 	}
 	s := fmt.Sprintf(TEXT_RULE_MSG,
 		f.RuleAlias(), f.LeagueName, f.TeamName,
+		m.Min, m.Sec,
 		f.HoScore, f.GuScore, f.Dogfall(),
 		half, rescore, sb, f.It)
 	return s
