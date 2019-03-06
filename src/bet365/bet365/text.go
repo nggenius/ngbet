@@ -27,6 +27,7 @@ const (
 当前比分:%d-%d
 平局概率:%d%%
 推荐:%s大%.1f
+当前水位:%.1f
 id:%s`
 
 	TEXT_ABOVE = "\n[忍者]注意：当前盘口(%.2f)高于推荐盘口,可等水"
@@ -74,11 +75,11 @@ id:%s`
 id:%s
 	`
 
-	GLOAL = `[进球] %s %s %d:%d %d-%d 
+	GLOAL = `[进球] %s %s %02d:%02d %d-%d 
 平局概率:%d%%
 id:%s`
 
-	INVALID = `[无效] %s %s %d:%d %d-%d 
+	INVALID = `[无效] %s %s %02d:%02d %d-%d 
 id:%s`
 
 	ATTENTION_EQ = `[忍者]注意 

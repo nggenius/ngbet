@@ -3,7 +3,6 @@ package bet365
 import (
 	"chat"
 	"fmt"
-	"log"
 	"math"
 	"sort"
 )
@@ -221,43 +220,23 @@ func (f *Filter) RuleAlias() string {
 func (f *Filter) CheckActive(m *Match) {
 	if f.Inactive {
 		switch f.Rule {
-		case RULE_HALF_05:
-			if m.Min == 30 &&
-				m.Score() == 0 {
+		case RULE_HALF_05, RULE_334:
+			if m.HalfSize-f.AboveSize() < 0.1 &&
+				m.HalfSizeBig >= 2.0 &&
+				m.Score() == f.Score() {
 				f.Inactive = false
 				f.Update("inactive")
-				msg := f.MakeRuleMessage()
-				log.Println(msg)
+				msg := f.MakeRuleMessage(m)
 				chat.SendToRecommend(msg)
 			}
-		case RULE_HALF_EQ:
-			if m.Min >= 20 &&
-				m.State == STATUS_FIRSTHALF &&
-				m.Score() == 0 && m.HalfSize < 0.51 && m.HalfSizeBig > 1.9 &&
-				math.Abs(m.HalfLet) > 0.24 {
+		case RULE_7091, RULE_757:
+			if m.Size-f.AboveSize() < 0.1 &&
+				m.SizeBig >= 2.0 &&
+				m.Score() == f.Score() {
 				f.Inactive = false
 				f.Update("inactive")
-				msg := f.MakeRuleMessage()
-				log.Println(msg)
+				msg := f.MakeRuleMessage(m)
 				chat.SendToRecommend(msg)
-			}
-		case RULE_LZ_001:
-			if m.Min >= 70 && m.Min <= 85 {
-				sub := math.Abs(m.AvgHm - m.AvgAw)
-				if sub < 0.001 || (sub > 0.99 && sub < 1.001) {
-					if f.extra == 1 {
-						f.Inactive = false
-						f.HoScore = m.HoScore
-						f.GuScore = m.GuScore
-						f.Update("inactive", "ho_score", "gu_score")
-						msg := f.MakeRuleMessage()
-						log.Println(msg)
-						chat.SendToRecommend(msg)
-						return
-					}
-					f.extra = 1
-				}
-
 			}
 		}
 
@@ -300,20 +279,21 @@ func (f *Filter) AboveSize() float64 {
 	return float64(f.HoScore+f.GuScore) + 0.5
 }
 
-func (f *Filter) MakeRuleMessage() string {
+func (f *Filter) MakeRuleMessage(m *Match) string {
 	rescore := f.AboveSize()
 	var half string
+	var sb float64
 	if f.HalfState == STATUS_FIRSTHALF {
 		half = "半场"
+		sb = m.HalfSizeBig
 	} else {
 		half = "全场"
+		sb = m.SizeBig
 	}
 	s := fmt.Sprintf(TEXT_RULE_MSG,
-		f.RuleAlias(), f.LeagueName, f.TeamName, f.HoScore, f.GuScore, f.Dogfall(), half, rescore, f.It)
-	if f.HalfState == STATUS_SECONDHALF && f.Size-rescore > 0.1 { // 当前盘比目标盘大
-		f.WaitOdd = true
-		s += fmt.Sprintf(TEXT_ABOVE, f.Size)
-	}
+		f.RuleAlias(), f.LeagueName, f.TeamName,
+		f.HoScore, f.GuScore, f.Dogfall(),
+		half, rescore, sb, f.It)
 	return s
 }
 

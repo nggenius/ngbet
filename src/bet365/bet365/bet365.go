@@ -345,7 +345,7 @@ func (b *Bet365) process() {
 		if match, ok = b.matchs[it]; !ok {
 			match = new(Match)
 			if match.Load(it) { // 尝试从数据库加载
-				log.Printf("[加载] %s %s", match.LeagueName, match.TeamName)
+				log.Printf("[加载] %s %s %s", match.LeagueName, match.TeamName, match.It)
 				b.addMatch(match)
 				match.Update(b.data, m)
 				continue
@@ -606,67 +606,60 @@ func (b *Bet365) CheckActive(m *Match) {
 func (b *Bet365) rulelz(m *Match) {
 	// 胜负赔率一样，或者相差一个点
 	// 上半场没球，盘口>=1.5或者<=2
-	if m.State != STATUS_MIDDLE {
-		return
-	}
+	// if m.State != STATUS_MIDDLE {
+	// 	return
+	// }
 
-	if m.Score() == 0 && (m.Size >= 1.5 || m.Size <= 2) {
-		f := new(Filter)
-		f.Rule = RULE_LZ_001
-		if f.LoadFromDB(m.It, f.Rule) {
-			return
-		}
+	// if m.Score() == 0 && (m.Size >= 1.5 || m.Size <= 2) {
+	// 	f := new(Filter)
+	// 	f.Rule = RULE_LZ_001
+	// 	if f.LoadFromDB(m.It, f.Rule) {
+	// 		return
+	// 	}
 
-		f.Inactive = true
-		f.HalfState = STATUS_SECONDHALF
-		f.FilterState = FILTER_STATE_NONE
-		f.CopyFromMatch(m)
-		f.Insert()
-		b.filter[m.It][f.Rule] = f
-	}
+	// 	f.Inactive = true
+	// 	f.HalfState = STATUS_SECONDHALF
+	// 	f.FilterState = FILTER_STATE_NONE
+	// 	f.CopyFromMatch(m)
+	// 	f.Insert()
+	// 	b.filter[m.It][f.Rule] = f
+	// }
 }
 
 func (b *Bet365) rulehalfeq(m *Match) {
-	if m.Min != 0 {
-		return
-	}
+	// if m.Min != 0 {
+	// 	return
+	// }
 
-	f := new(Filter)
-	f.Rule = RULE_HALF_EQ
-	if f.LoadFromDB(m.It, f.Rule) {
-		return
-	}
+	// if m.AvgEq > 3.0 && m.AvgEq < 3.7 {
+	// 	avgeq := m.AvgEq * 0.618
+	// 	if m.HalfAvgEq > 2.05 && m.HalfAvgEq-avgeq > 0.15 && math.Abs(m.HalfLet) > 0.24 {
+	// 		f := new(Filter)
+	// 		f.Rule = RULE_HALF_EQ
+	// 		if f.LoadFromDB(m.It, f.Rule) {
+	// 			return
+	// 		}
 
-	f.Inactive = true
-
-	if m.AvgEq > 3.0 && m.AvgEq < 3.7 {
-		avgeq := m.AvgEq * 0.618
-		if m.HalfAvgEq > 2.05 && m.HalfAvgEq-avgeq > 0.15 && math.Abs(m.HalfLet) > 0.24 {
-			f.HalfState = STATUS_FIRSTHALF
-			f.FilterState = FILTER_STATE_NONE
-			f.CopyFromMatch(m)
-			f.Insert()
-			b.filter[m.It][f.Rule] = f
-			msg := fmt.Sprintf(ATTENTION_EQ, m.LeagueName, m.TeamName, m.It)
-			log.Println(msg)
-			chat.SendToRecommend(msg)
-		}
-	}
+	// 		f.Inactive = true
+	// 		f.HalfState = STATUS_FIRSTHALF
+	// 		f.FilterState = FILTER_STATE_NONE
+	// 		f.CopyFromMatch(m)
+	// 		f.Insert()
+	// 		b.filter[m.It][f.Rule] = f
+	// 		msg := fmt.Sprintf(ATTENTION_EQ, m.LeagueName, m.TeamName, m.It)
+	// 		log.Println(msg)
+	// 		chat.SendToRecommend(msg)
+	// 	}
+	// }
 
 }
 
 func (b *Bet365) rulehalf05(m *Match) {
+
 	if m.Min != 20 || m.Score() != 0 {
 		return
 	}
 
-	f := new(Filter)
-	f.Rule = RULE_HALF_05
-	if f.LoadFromDB(m.It, f.Rule) {
-		return
-	}
-
-	//f.Inactive = true
 	// 大小盘中水以上，大小盘2球以上， 降一个盘以内， 初盘大小球2.25-3.0之间,
 	// 初盘让0.5以上
 	if m.SizeBig > 1.85 &&
@@ -675,14 +668,26 @@ func (b *Bet365) rulehalf05(m *Match) {
 		m.FirstSize > 2.249 &&
 		m.FirstSize < 3.01 &&
 		math.Abs(m.FirstLet) > 0.49 {
+
+		f := new(Filter)
+		f.Rule = RULE_HALF_05
+		if f.LoadFromDB(m.It, f.Rule) {
+			return
+		}
 		f.HalfState = STATUS_FIRSTHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
+
+		if m.HalfSize-f.AboveSize() > 0.1 || m.HalfSizeBig < 2.0 { // 等水
+			f.Inactive = true
+		}
 		f.Insert()
+
 		b.filter[m.It][f.Rule] = f
-		msg := f.MakeRuleMessage()
-		log.Println(msg)
-		chat.SendToRecommend(msg)
+		if !f.Inactive {
+			msg := f.MakeRuleMessage(m)
+			chat.SendToRecommend(msg)
+		}
 	}
 
 }
@@ -700,11 +705,16 @@ func (b *Bet365) rule334(m *Match) {
 	f.HalfState = STATUS_FIRSTHALF
 	f.FilterState = FILTER_STATE_NONE
 	f.CopyFromMatch(m)
+	if f.HalfSize-f.AboveSize() > 0.1 || f.HalfSizeBig < 2.0 { // 等水
+		f.Inactive = true
+	}
 	f.Insert()
 	b.filter[m.It][f.Rule] = f
-	msg := f.MakeRuleMessage()
-	log.Println(msg)
-	chat.SendToRecommend(msg)
+	if !f.Inactive {
+		msg := f.MakeRuleMessage(m)
+		chat.SendToRecommend(msg)
+	}
+
 }
 
 func (b *Bet365) rule7091(m *Match) {
@@ -716,7 +726,6 @@ func (b *Bet365) rule7091(m *Match) {
 		math.Abs(float64(m.HoScore-m.GuScore)) < 1.01 &&
 		m.SizeBig > 1.85 &&
 		m.SizeBig < 2.0 {
-
 		f := new(Filter)
 		f.Rule = RULE_7091
 		if f.LoadFromDB(m.It, f.Rule) {
@@ -726,11 +735,17 @@ func (b *Bet365) rule7091(m *Match) {
 		f.HalfState = STATUS_SECONDHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
+
+		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < 2.0 { // 等水
+			f.Inactive = true
+		}
 		f.Insert()
 		b.filter[m.It][f.Rule] = f
-		msg := f.MakeRuleMessage()
-		log.Println(msg)
-		chat.SendToRecommend(msg)
+
+		if !f.Inactive {
+			msg := f.MakeRuleMessage(m)
+			chat.SendToRecommend(msg)
+		}
 	}
 }
 
@@ -748,11 +763,15 @@ func (b *Bet365) rule757(m *Match) {
 		f.HalfState = STATUS_SECONDHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
+		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < 2.0 {
+			f.Inactive = true
+		}
 		f.Insert()
 		b.filter[m.It][f.Rule] = f
-		msg := f.MakeRuleMessage()
-		log.Println(msg)
-		chat.SendToRecommend(msg)
+		if !f.Inactive {
+			msg := f.MakeRuleMessage(m)
+			chat.SendToRecommend(msg)
+		}
 	}
 }
 
