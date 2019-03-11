@@ -33,6 +33,8 @@ const (
 	STATUS_COMPLETE   = 4 // 完赛
 )
 
+const WAIT_ODD = 1.9
+
 const (
 	RULE_334     = "334"
 	RULE_7091    = "7091"
@@ -678,7 +680,7 @@ func (b *Bet365) rulehalf05(m *Match) {
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
 
-		if m.HalfSize-f.AboveSize() > 0.1 || m.HalfSizeBig < 2.0 { // 等水
+		if m.HalfSize-f.AboveSize() > 0.1 || m.HalfSizeBig < WAIT_ODD { // 等水
 			f.Inactive = true
 		}
 		f.Insert()
@@ -705,7 +707,7 @@ func (b *Bet365) rule334(m *Match) {
 	f.HalfState = STATUS_FIRSTHALF
 	f.FilterState = FILTER_STATE_NONE
 	f.CopyFromMatch(m)
-	if f.HalfSize-f.AboveSize() > 0.1 || f.HalfSizeBig < 2.0 { // 等水
+	if f.HalfSize-f.AboveSize() > 0.1 || f.HalfSizeBig < WAIT_ODD { // 等水
 		f.Inactive = true
 	}
 	f.Insert()
@@ -736,7 +738,7 @@ func (b *Bet365) rule7091(m *Match) {
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
 
-		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < 2.0 { // 等水
+		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < WAIT_ODD { // 等水
 			f.Inactive = true
 		}
 		f.Insert()
@@ -763,7 +765,7 @@ func (b *Bet365) rule757(m *Match) {
 		f.HalfState = STATUS_SECONDHALF
 		f.FilterState = FILTER_STATE_NONE
 		f.CopyFromMatch(m)
-		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < 2.0 {
+		if m.Size-f.AboveSize() > 0.1 || m.SizeBig < WAIT_ODD {
 			f.Inactive = true
 		}
 		f.Insert()

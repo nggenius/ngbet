@@ -222,7 +222,7 @@ func (f *Filter) CheckActive(m *Match) {
 		switch f.Rule {
 		case RULE_HALF_05, RULE_334:
 			if m.HalfSize-f.AboveSize() < 0.1 &&
-				m.HalfSizeBig >= 2.0 &&
+				m.HalfSizeBig >= WAIT_ODD &&
 				m.Score() == f.Score() {
 				f.Inactive = false
 				f.Update("inactive")
@@ -231,7 +231,7 @@ func (f *Filter) CheckActive(m *Match) {
 			}
 		case RULE_7091, RULE_757:
 			if m.Size-f.AboveSize() < 0.1 &&
-				m.SizeBig >= 2.0 &&
+				m.SizeBig >= WAIT_ODD &&
 				m.Score() == f.Score() {
 				f.Inactive = false
 				f.Update("inactive")
