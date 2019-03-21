@@ -1,19 +1,17 @@
 {
     "bet365": {
         "wsurl": "premws-pt3.365pushodds.com",
-        "host": "https://www.348365365.com"
+        "host": "https://www.448365365.com"
     },
     "recommend": [
-        "https://oapi.dingtalk.com/robot/send?access_token=c858baba94d4b7183840aaa6321fddf73e44c029139813303aff6ac347f6ec7d"
+
     ],
     "broadcast": [
-        "https://oapi.dingtalk.com/robot/send?access_token=1b889aa75b96c65b7620c157a95109a701070ae42fdf7c651db4019bf11c36be"
+ 
     ],
     "rule": {
         "update": [
-            "334",
             "7091",
-            "757",
             "half0.5"
         ],
         "state": {

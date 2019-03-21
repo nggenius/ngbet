@@ -23,3 +23,7 @@
 1. 亚赔让球盘初盘为平手盘
 2.比赛进行至75分钟以后主队2球落后（3球也可，4球以上谨慎）
 3.此时让球盘仍为平手盘
+
+select a.* , (b.ho_score+b.gu_score > a.ho_score + a.gu_score) as win 
+from snap_shot as a, (select * from snap_shot group by it) as b 
+where a.it = b.it and  a.min=70 and a.id > 238948

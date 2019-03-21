@@ -279,6 +279,24 @@ func (f *Filter) AboveSize() float64 {
 	return float64(f.HoScore+f.GuScore) + 0.5
 }
 
+func (f *Filter) getData() [40]float64 {
+	return [40]float64{
+		float64(f.HoScore), float64(f.HoHalfScore), float64(f.GuScore), float64(f.GuHalfScore),
+		f.HalfLet, f.HalfLetHm, f.HalfLetAw,
+		f.HalfAvgHm, f.HalfAvgAw, f.HalfAvgEq,
+		f.HalfSize, f.HalfSizeBig, f.HalfSizeSma,
+		f.HalfFirstLet, f.HalfFirstLetHm, f.HalfFirstLetAw,
+		f.HalfFirstAvgHm, f.HalfFirstAvgAw, f.HalfFirstAvgEq,
+		f.HalfFirstSize, f.HalfFirstSizeBig, f.HalfFirstSizeSma,
+		f.Let, f.LetHm, f.LetAw,
+		f.AvgHm, f.AvgAw, f.AvgEq,
+		f.Size, f.SizeBig, f.SizeSma,
+		f.FirstLet, f.FirstLetHm, f.FirstLetAw,
+		f.FirstAvgHm, f.FirstAvgAw, f.FirstAvgEq,
+		f.FirstSize, f.FirstSizeBig, f.FirstSizeSma,
+	}
+}
+
 func (f *Filter) MakeRuleMessage(m *Match) string {
 	rescore := f.AboveSize()
 	var half string
@@ -294,7 +312,9 @@ func (f *Filter) MakeRuleMessage(m *Match) string {
 		f.RuleAlias(), f.LeagueName, f.TeamName,
 		m.Min, m.Sec,
 		f.HoScore, f.GuScore, f.Dogfall(),
-		half, rescore, sb, f.It)
+		half, rescore,
+		forecast(f.getData()),
+		sb, f.It)
 	return s
 }
 
