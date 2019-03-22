@@ -301,20 +301,24 @@ func (f *Filter) MakeRuleMessage(m *Match) string {
 	rescore := f.AboveSize()
 	var half string
 	var sb float64
+	var aiExp float64
 	if f.HalfState == STATUS_FIRSTHALF {
 		half = "半场"
 		sb = m.HalfSizeBig
+		aiExp = forecastHalf(f.getData())
 	} else {
 		half = "全场"
 		sb = m.SizeBig
+		aiExp = forecast(f.getData())
 	}
 	s := fmt.Sprintf(TEXT_RULE_MSG,
 		f.RuleAlias(), f.LeagueName, f.TeamName,
 		m.Min, m.Sec,
 		f.HoScore, f.GuScore, f.Dogfall(),
 		half, rescore,
-		forecast(f.getData()),
-		sb, f.It)
+		sb,
+		aiExp,
+		f.It)
 	return s
 }
 

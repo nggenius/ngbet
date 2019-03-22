@@ -25,5 +25,10 @@
 3.此时让球盘仍为平手盘
 
 select a.* , (b.ho_score+b.gu_score > a.ho_score + a.gu_score) as win 
-from snap_shot as a, (select * from snap_shot group by it) as b 
+from snap_shot as a, (select * from snap_shot where state=2 group by it) as b 
+where a.it = b.it and  a.min=20 and a.id > 238948
+
+
+select a.* , (b.ho_score+b.gu_score > a.ho_score + a.gu_score) as win 
+from snap_shot as a, (select * from snap_shot where state=4 group by it) as b 
 where a.it = b.it and  a.min=70 and a.id > 238948
