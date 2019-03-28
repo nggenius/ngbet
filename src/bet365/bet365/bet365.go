@@ -393,11 +393,11 @@ func (b *Bet365) process() {
 	if len(dels) > 0 {
 		for _, it := range dels {
 			if match, ok := b.matchs[it]; ok {
-				if match.State != STATUS_COMPLETE {
-					match.State = STATUS_COMPLETE
-				}
+				// if match.State != STATUS_COMPLETE {
+				// 	match.State = STATUS_COMPLETE
+				// }
 				// 删除前再检查一下状态
-				b.CheckBlack(match)
+				//b.CheckBlack(match)
 				delete(b.matchs, it)
 				delete(b.filter, it)
 				delete(b.notify, it)
