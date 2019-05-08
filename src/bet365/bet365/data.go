@@ -628,7 +628,8 @@ func ParseData(d *Bet365Data, path []byte, data []byte) error {
 	switch it {
 	case "OVInPlay_10_0":
 		ParseInPlay(d, p, data)
-	case "OVM1", "OVM2", "OVM3":
+	case "OVM1", "OVM2", "OVM8_10_0":
+		//log.Println(string(path), string(data))
 		ParseOVM(it, d, p, data)
 	case "__time":
 		d.parseTime(data)
