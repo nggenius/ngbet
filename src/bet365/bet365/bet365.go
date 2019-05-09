@@ -138,9 +138,9 @@ func NewBet365() *Bet365 {
 	b := new(Bet365)
 	b.data = NewBet365Data("")
 	b.data.AddNode(b.data.Root, NewSimpleNode("OVInPlay_10_0"))
-	b.data.AddNode(b.data.Root, NewSimpleNode("OVM1"))
-	b.data.AddNode(b.data.Root, NewSimpleNode("OVM2"))
-	b.data.AddNode(b.data.Root, NewSimpleNode("OVM8_10_0"))
+	b.data.AddNode(b.data.Root, NewSimpleNode(OVMDEF))
+	b.data.AddNode(b.data.Root, NewSimpleNode(OVMHALF))
+	b.data.AddNode(b.data.Root, NewSimpleNode(OVMFULL))
 	b.conn = new(bet365conn)
 	b.matchs = make(map[string]*Match)
 	b.filter = make(map[string]map[string]*Filter)
@@ -168,13 +168,13 @@ func (b *Bet365) onMessage(data []byte) error {
 		ParseData(b.data, path, ss[1])
 		switch string(path) {
 		case "CONFIG_10_0":
-			err := b.conn.subscibe("aGbjXC")
+			err := b.conn.subscibe("hqi0EJ")
 			if err != nil {
 				return err
 			}
 		case "OVInPlay_10_0":
 			if !b.sendovm {
-				for _, s := range []string{"OVM2", "OVM8_10_0"} {
+				for _, s := range []string{OVMDEF, OVMHALF, OVMFULL} {
 					err := b.conn.subscibe(s) // 亚洲让分盘
 					if err != nil {
 						return err

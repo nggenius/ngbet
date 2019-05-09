@@ -1,6 +1,7 @@
 package bet365
 
 var (
-	HALF = "OVM"
-	FULL = "OVM8"
+	OVMDEF  = "OVM1"
+	OVMHALF = "OVM2"
+	OVMFULL = "OVM3"
 )
