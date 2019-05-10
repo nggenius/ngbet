@@ -168,7 +168,12 @@ func (b *Bet365) onMessage(data []byte) error {
 		ParseData(b.data, path, ss[1])
 		switch string(path) {
 		case "CONFIG_10_0":
-			err := b.conn.subscibe("hqi0EJ,OVInPlay_10_0")
+			err := b.conn.subscibe("hqi0EJ")
+			if err != nil {
+				return err
+			}
+		case "HR_L10_Z0_C1_W1":
+			err := b.conn.subscibe("OVInPlay_10_0")
 			if err != nil {
 				return err
 			}
