@@ -3,6 +3,7 @@ package bet365
 import (
 	"chat"
 	"fmt"
+	"log"
 	"math"
 	"sort"
 )
@@ -236,6 +237,7 @@ func (f *Filter) CheckActive(m *Match) {
 				f.Inactive = false
 				f.Update("inactive")
 				msg := f.MakeRuleMessage(m)
+				log.Println(msg)
 				chat.SendToRecommend(msg)
 			}
 		}

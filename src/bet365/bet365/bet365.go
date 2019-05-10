@@ -751,6 +751,7 @@ func (b *Bet365) rule7091(m *Match) {
 
 		if !f.Inactive {
 			msg := f.MakeRuleMessage(m)
+			log.Println(msg)
 			chat.SendToRecommend(msg)
 		}
 	}
@@ -889,7 +890,7 @@ func Run(addr string, origin string, getcookieurl string) {
 	engine.DatabaseTZ = time.Local
 	engine.TZLocation = time.Local
 
-	chat.SendToRecommend("初始化⚽[尴尬][红包][炸弹][忍者]")
+	//chat.SendToRecommend("初始化⚽[尴尬][红包][炸弹][忍者]")
 	bet = NewBet365()
 	delay := time.Second * 3
 	retrys := 0
