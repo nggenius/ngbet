@@ -138,7 +138,7 @@ func NewBet365() *Bet365 {
 	b := new(Bet365)
 	b.data = NewBet365Data("")
 	b.data.AddNode(b.data.Root, NewSimpleNode("OVInPlay_10_0"))
-	b.data.AddNode(b.data.Root, NewSimpleNode(OVMDEF))
+	b.data.AddNode(b.data.Root, NewSimpleNode(OVMMAIN))
 	b.data.AddNode(b.data.Root, NewSimpleNode(OVMHALF))
 	b.data.AddNode(b.data.Root, NewSimpleNode(OVMFULL))
 	b.conn = new(bet365conn)
@@ -155,7 +155,7 @@ func (b *Bet365) Dump() {
 func (b *Bet365) onMessage(data []byte) error {
 	xx := bytes.Split(data, []byte(_DELIMITERS_MESSAGE))
 	if xx[0][0] == '1' {
-		err := b.conn.subscibe("CONFIG_10_0,OVInPlay_10_0,InPlay_10_0")
+		err := b.conn.subscibe("CONFIG_10_0,HL_L10_Z0_C1_W1,HR_L10_Z0_C1_W1")
 		if err != nil {
 			return err
 		}
@@ -168,13 +168,13 @@ func (b *Bet365) onMessage(data []byte) error {
 		ParseData(b.data, path, ss[1])
 		switch string(path) {
 		case "CONFIG_10_0":
-			err := b.conn.subscibe("hqi0EJ")
+			err := b.conn.subscibe("hqi0EJ,OVInPlay_10_0")
 			if err != nil {
 				return err
 			}
 		case "OVInPlay_10_0":
 			if !b.sendovm {
-				for _, s := range []string{OVMDEF, OVMHALF, OVMFULL} {
+				for _, s := range []string{OVMMAIN, OVMHALF, OVMFULL} {
 					err := b.conn.subscibe(s) // 亚洲让分盘
 					if err != nil {
 						return err
